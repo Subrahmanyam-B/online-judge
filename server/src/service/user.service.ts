@@ -38,8 +38,16 @@ export const CreateUser = async (
   } as User);
 
   if (newUser) {
-    const accessToken = GenerateAccessSignature(newUser);
-    const refreshToken = GenerateRefreshSignature(newUser);
+    const accessToken = GenerateAccessSignature({
+      id: newUser.id,
+      email: newUser.email,
+      verified: newUser.verified
+    });
+    const refreshToken = GenerateRefreshSignature({
+      id: newUser.id,
+      email: newUser.email,
+      verified: newUser.verified
+    });
     //send the result to the client
     return {
       accessToken: accessToken,
@@ -61,8 +69,16 @@ export const UserLogin = async (input: LoginInput, repo: UserRepositoryType) => 
   console.log(validation);
 
   if (validation) {
-    const accessToken = GenerateAccessSignature(existingCustomer);
-    const refreshToken = GenerateRefreshSignature(existingCustomer);
+    const accessToken = GenerateAccessSignature({
+      id: existingCustomer.id,
+      email: existingCustomer.email,
+      verified: existingCustomer.verified,
+    });
+    const refreshToken = GenerateRefreshSignature({
+      id: existingCustomer.id,
+      email: existingCustomer.email,
+      verified: existingCustomer.verified,
+    });
     //send the result to the client
     return {
       accessToken: accessToken,
@@ -83,6 +99,22 @@ export const VerifyUser = async (user: AuthPayload, input: VerificationInput, re
     return data;
   } else {
     throw new ValidationError();
+  }
+
+}
+
+export const GetNewAccessToken = async (user: AuthPayload, repo: UserRepositoryType) => {
+
+  const accessToken = GenerateAccessSignature({
+    id: user.id,
+    email: user.email,
+    verified: user.verified
+  });
+
+  console.log("token", accessToken);
+
+  return {
+    accessToken: accessToken
   }
 
 }

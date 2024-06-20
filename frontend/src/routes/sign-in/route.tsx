@@ -1,10 +1,11 @@
-import { api } from "@/api/axios";
+import { login } from "@/api/login";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authAtom } from "@/state/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useCookies } from "react-cookie";
 import { useForm } from "react-hook-form";
+import { useRecoilValue } from "recoil";
 import { z } from "zod";
 
 
@@ -15,9 +16,14 @@ const formSchema = z.object({
 })
 
 const SignInForm = () => {
-  const [cookies, setCookie] = useCookies(['refreshToken', 'accessToken'])
-
   const router = useRouter()
+  const auth = useRecoilValue(authAtom)
+
+  if(auth !== "") {
+     router.history.push('/dashboard')
+  }
+
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -30,9 +36,8 @@ const SignInForm = () => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     try {
-      const response = await api.post('/login', JSON.stringify({ email: values.email, password: values.password }))
-      setCookie('accessToken', response.data?.accessToken)
-      setCookie('refreshToken', response.data?.refreshToken)
+      const response  = await login(values.email, values.password);
+      console.log(response)
       router.history.push('/dashboard')
     } catch (error) {
       console.log(error);
@@ -106,8 +111,18 @@ const SignIn = () => {
   )
 }
 
+// const Loader = () => {
+//     const auth = useRecoilValue(authAtom);
+//     if(auth !== "") {
+//      throw redirect({
+//       to: '/dashboard',
+//      })
+//     }
+// }
+
 export const Route = createFileRoute('/sign-in')({
-  component: SignIn
+  component: SignIn,
+  // loader: Loader
 })
 
 

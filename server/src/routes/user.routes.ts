@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import * as service from "../service/user.service";
 import * as repository from "../repository/user.repository";
-import { ValidateRefreshToken, ValidateRequest } from "../utils";
+import { ValidateRefreshToken, ValidateRequest, logger } from "../utils";
 import {
   LoginInput,
   LoginInputSchema,
@@ -10,7 +10,7 @@ import {
   VerificationInput,
   VerificationInputSchema,
 } from "../dto/user.dto";
-import { Authenticate } from "../middlewares";
+import { Authenticate, AuthenticateRefreshToken } from "../middlewares";
 
 const router = express.Router();
 const repo = repository.UserRepository;
@@ -54,6 +54,7 @@ router.post(
         sameSite: "none",
         maxAge: 30 * 24 * 60 * 60 * 1000 //cookie expiry: set to match rT
       })
+      logger.info("User Login")
       return res.status(200).json(response);
     } catch (error) {
       return res.status(404).json({ error });
@@ -84,12 +85,10 @@ router.post(
   }
 );
 
-router.get("/refresh", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/refresh", AuthenticateRefreshToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const accessToken = await ValidateRefreshToken(req);
-
-    return res.status(200).json({ accessToken: accessToken })
-
+    const response = await service.GetNewAccessToken(req.user, repo)
+    return res.status(200).json(response)
   } catch (error) {
     return res.status(404).json({ error });
   }
@@ -97,6 +96,7 @@ router.get("/refresh", async (req: Request, res: Response, next: NextFunction) =
 
 router.get("/user", Authenticate, async (req: Request, res: Response, next: NextFunction) => {
   const response = await service.GetProfile(req.user, repo);
+  logger.info("GET USER PROFILE")
   return res.status(200).json(response);
 });
 

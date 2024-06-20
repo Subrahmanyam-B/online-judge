@@ -31,11 +31,12 @@ export const ValidatePassword = async (
 };
 
 export const GenerateRefreshSignature = (payload: AuthPayload) => {
-  return jwt.sign(payload, REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: "1d" });
+  return jwt.sign(payload, REFRESH_TOKEN_SECRET as jwt.Secret, { expiresIn: "7d" });
 };
 
 export const GenerateAccessSignature = (payload: AuthPayload) => {
-  return jwt.sign(payload, ACCESS_TOKEN_SECRET as jwt.Secret, { expiresIn: "30d" });
+  console.log("gen access token")
+  return jwt.sign(payload, ACCESS_TOKEN_SECRET as jwt.Secret, { expiresIn: "1d" });
 };
 
 export const ValidateSignature = async (req: Request) => {
@@ -57,21 +58,18 @@ export const ValidateSignature = async (req: Request) => {
 
 export const ValidateRefreshToken = async (req: Request) => {
   try {
-    const cookies = req.cookies;
+    const signature = req.get("Authorization");
+    if (signature) {
+      const payload = await jwt.verify(signature.split(" ")[1], REFRESH_TOKEN_SECRET as jwt.Secret) as AuthPayload;
+      req.user = payload;
+      return true;
+    } else {
+      return false;
+    }
 
-    if (!cookies.refreshToken) return null;
-
-    const refreshToken = cookies.refreshToken;
-
-    const payload = await jwt.verify(refreshToken, REFRESH_TOKEN_SECRET as jwt.Secret) as AuthPayload;
-    req.user = payload;
-
-    const newAccessToken = GenerateAccessSignature(payload);
-
-    return newAccessToken;
-  }
-  catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log(error);
+    return false;
   }
 }
 
