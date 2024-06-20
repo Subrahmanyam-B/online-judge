@@ -1,9 +1,11 @@
 import { ValidationError } from "class-validator";
 import {
+  AuthorizeError,
+  GenerateAccessSignature,
   GenerateOtp,
   GeneratePassword,
+  GenerateRefreshSignature,
   GenerateSalt,
-  GenerateSignature,
   NotFoundError,
   ValidatePassword,
 } from "../utils";
@@ -35,11 +37,13 @@ export const CreateUser = async (
     verified: false,
   } as User);
 
-  if(newUser){
-    const signature = GenerateSignature(newUser);
+  if (newUser) {
+    const accessToken = GenerateAccessSignature(newUser);
+    const refreshToken = GenerateRefreshSignature(newUser);
     //send the result to the client
     return {
-      signature: signature,
+      accessToken: accessToken,
+      refreshToken: refreshToken
     }
     // return res.status(201).json({
     //   signature: signature,
@@ -51,36 +55,40 @@ export const UserLogin = async (input: LoginInput, repo: UserRepositoryType) => 
   const { email, password } = input;
   const existingCustomer = await repo.findUser(email);
   if (!existingCustomer) throw new NotFoundError("User not found");
-  
+
   const validation = await ValidatePassword(password, existingCustomer.password, existingCustomer.salt);
 
-  if(validation){
-    const signature = GenerateSignature(existingCustomer);
+  console.log(validation);
 
+  if (validation) {
+    const accessToken = GenerateAccessSignature(existingCustomer);
+    const refreshToken = GenerateRefreshSignature(existingCustomer);
+    //send the result to the client
     return {
-      signature: signature,
+      accessToken: accessToken,
+      refreshToken: refreshToken
     }
   }
-
+  return { message: "Validation issue" }
 }
 
-export const VerifyUser = async (user: AuthPayload,  input: VerificationInput, repo: UserRepositoryType) => {
+export const VerifyUser = async (user: AuthPayload, input: VerificationInput, repo: UserRepositoryType) => {
   const { verificationCode } = input;
   const existingCustomer = await repo.findUser(user.email);
   if (!existingCustomer) throw new NotFoundError("User not found");
 
-  if(existingCustomer.verificationCode === verificationCode){
+  if (existingCustomer.verificationCode === verificationCode) {
     existingCustomer.verified = true;
     const data = await repo.updateUser(existingCustomer);
     return data;
-  }else{
+  } else {
     throw new ValidationError();
   }
 
 }
 
-export const GetUser = async (input: any, repo: UserRepositoryType) => {
-  const data = await repo.findUser(input);
+export const GetProfile = async (user: AuthPayload, repo: UserRepositoryType) => {
+  const data = await repo.getProfile(user.email);
   return data;
 };
 

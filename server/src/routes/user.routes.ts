@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import * as service from "../service/user.service";
 import * as repository from "../repository/user.repository";
-import { ValidateRequest } from "../utils";
+import { ValidateRefreshToken, ValidateRequest } from "../utils";
 import {
   LoginInput,
   LoginInputSchema,
@@ -25,6 +25,12 @@ router.post(
         return res.status(404).json({ error });
       }
       const response = await service.CreateUser(req.body as SignupInput, repo);
+      res.cookie('refreshToken', response.refreshToken, {
+        httpOnly: true, //accessible only by web server 
+        secure: true, //https
+        sameSite: "none",
+        maxAge: 30 * 24 * 60 * 60 * 1000 //cookie expiry: set to match rT
+      })
       return res.status(200).json(response);
     } catch (error) {
       // Handle other errors
@@ -38,14 +44,19 @@ router.post(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const error = ValidateRequest<LoginInput>(req.body, LoginInputSchema);
-
       if (error) {
         return res.status(404).json({ error });
       }
       const response = await service.UserLogin(req.body, repo);
+      res.cookie('refreshToken', response.refreshToken, {
+        httpOnly: true, //accessible only by web server 
+        secure: true, //https
+        sameSite: "none",
+        maxAge: 30 * 24 * 60 * 60 * 1000 //cookie expiry: set to match rT
+      })
       return res.status(200).json(response);
     } catch (error) {
-      res.status(404).json({ error });
+      return res.status(404).json({ error });
     }
   }
 );
@@ -68,15 +79,28 @@ router.post(
       //   message: "User Verified",
       // });
     } catch (error) {
-      res.status(404).json({ error });
+      return res.status(404).json({ error });
     }
   }
 );
 
-router.get("/user", async (req: Request, res: Response, next: NextFunction) => {
-  const response = await service.GetUser(req.body, repo);
+router.get("/refresh", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const accessToken = await ValidateRefreshToken(req);
+
+    return res.status(200).json({ accessToken: accessToken })
+
+  } catch (error) {
+    return res.status(404).json({ error });
+  }
+})
+
+router.get("/user", Authenticate, async (req: Request, res: Response, next: NextFunction) => {
+  const response = await service.GetProfile(req.user, repo);
   return res.status(200).json(response);
 });
+
+
 router.patch(
   "/user",
   async (req: Request, res: Response, next: NextFunction) => {

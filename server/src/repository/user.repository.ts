@@ -6,6 +6,7 @@ import { AuthPayload } from "../dto/user.dto";
 export type UserRepositoryType = {
   createUser: (createUserInput: User) => Promise<AuthPayload>;
   findUser: (email: string) => Promise<User>;
+  getProfile: (email: string) => Promise<User>;
   getAllUsers: () => Promise<{}>;
   updateUser: (updateUserInput: User) => Promise<number>;
   deleteUser: (deleteUserInput: User) => Promise<{}>;
@@ -27,14 +28,28 @@ const createUser = async (input: User): Promise<AuthPayload> => {
 };
 
 const findUser = async (email: string): Promise<User> => {
-  const [result] = await DB.select().from(user).where(eq(user.email, email));
+  const [result] = await DB.select().from(user).where(eq(user.email, email))
 
   return result as User;
 };
 
+const getProfile = async (email: string): Promise<User> => {
+
+  const [result] = await DB.select({
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    displayName: user.displayName,
+    email: user.email,
+  }).from(user).where(eq(user.email, email))
+
+  return result as User;
+}
+
 const getAllUsers = async (): Promise<{}> => {
   return Promise.resolve({ mesaage: "Get all Users" });
 };
+
 
 const updateUser = async (input: User): Promise<number> => {
   const [result] = await DB.update(user)
@@ -52,6 +67,7 @@ const deleteUser = async (input: any): Promise<{}> => {
 export const UserRepository: UserRepositoryType = {
   createUser,
   findUser,
+  getProfile,
   getAllUsers,
   updateUser,
   deleteUser,
