@@ -1,4 +1,4 @@
-import { login } from "@/api/login";
+import { login } from "@/api/auth";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { authAtom } from "@/state/auth";

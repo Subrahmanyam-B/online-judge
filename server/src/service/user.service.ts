@@ -8,6 +8,7 @@ import {
   GenerateSalt,
   NotFoundError,
   ValidatePassword,
+  logger,
 } from "../utils";
 import { AuthPayload, LoginInput, SignupInput, VerificationInput } from "../dto/user.dto";
 import { UserRepositoryType } from "../repository/user.repository";
@@ -41,22 +42,27 @@ export const CreateUser = async (
     const accessToken = GenerateAccessSignature({
       id: newUser.id,
       email: newUser.email,
-      verified: newUser.verified
+      verified: newUser.verified,
+      role: newUser.role
     });
     const refreshToken = GenerateRefreshSignature({
       id: newUser.id,
       email: newUser.email,
-      verified: newUser.verified
+      verified: newUser.verified,
+      role: newUser.role
     });
+
+    logger.info("User Sign UP")
+
     //send the result to the client
     return {
       accessToken: accessToken,
       refreshToken: refreshToken
     }
-    // return res.status(201).json({
-    //   signature: signature,
-    // });
   }
+
+  logger.error("Error with Sign Up")
+  throw new AuthorizeError("Unable to Sign Up")
 };
 
 export const UserLogin = async (input: LoginInput, repo: UserRepositoryType) => {
@@ -73,11 +79,13 @@ export const UserLogin = async (input: LoginInput, repo: UserRepositoryType) => 
       id: existingCustomer.id,
       email: existingCustomer.email,
       verified: existingCustomer.verified,
+      role: existingCustomer.role,
     });
     const refreshToken = GenerateRefreshSignature({
       id: existingCustomer.id,
       email: existingCustomer.email,
       verified: existingCustomer.verified,
+      role: existingCustomer.role,
     });
     //send the result to the client
     return {
@@ -108,7 +116,8 @@ export const GetNewAccessToken = async (user: AuthPayload, repo: UserRepositoryT
   const accessToken = GenerateAccessSignature({
     id: user.id,
     email: user.email,
-    verified: user.verified
+    verified: user.verified,
+    role: user.role,
   });
 
   console.log("token", accessToken);

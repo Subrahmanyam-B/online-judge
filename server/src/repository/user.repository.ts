@@ -1,56 +1,59 @@
 import { eq } from "drizzle-orm";
 import { DB } from "../db/db.connection";
 import { User, user } from "../db/schema";
-import { AuthPayload } from "../dto/user.dto";
 
+// Type definition for the UserRepository
 export type UserRepositoryType = {
-  createUser: (createUserInput: User) => Promise<AuthPayload>;
-  findUser: (email: string) => Promise<User>;
-  getProfile: (email: string) => Promise<User>;
-  getAllUsers: () => Promise<{}>;
-  updateUser: (updateUserInput: User) => Promise<number>;
-  deleteUser: (deleteUserInput: User) => Promise<{}>;
+  createUser: (createUserInput: User) => Promise<User>; // Creates a new user
+  findUser: (email: string) => Promise<User>; // Finds a user by email
+  getProfile: (email: string) => Promise<User>; // Gets a user's profile by email
+  getAllUsers: () => Promise<{}>; // Gets all users
+  updateUser: (updateUserInput: User) => Promise<number>; // Updates a user
+  deleteUser: (deleteUserInput: User) => Promise<{}>; // Deletes a user
 };
 
-const createUser = async (input: User): Promise<AuthPayload> => {
-  const [result] = await DB.insert(user)
-    .values(input)
-    .returning({
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      displayName: user.displayName,
-      verified: user.verified,
-    });
-
-  return result as AuthPayload;
-};
-
-const findUser = async (email: string): Promise<User> => {
-  const [result] = await DB.select().from(user).where(eq(user.email, email))
+// Creates a new user
+const createUser = async (input: User): Promise<User> => {
+  const [result] = await DB.insert(user).values(input).returning({
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    displayName: user.displayName,
+    verified: user.verified,
+  });
 
   return result as User;
 };
 
-const getProfile = async (email: string): Promise<User> => {
+// Finds a user by email
+const findUser = async (email: string): Promise<User> => {
+  const [result] = await DB.select().from(user).where(eq(user.email, email));
 
+  return result as User;
+};
+
+// Gets a user's profile by email
+const getProfile = async (email: string): Promise<User> => {
   const [result] = await DB.select({
     id: user.id,
     firstName: user.firstName,
     lastName: user.lastName,
     displayName: user.displayName,
     email: user.email,
-  }).from(user).where(eq(user.email, email))
+  })
+    .from(user)
+    .where(eq(user.email, email));
 
   return result as User;
-}
+};
 
+// Gets all users
 const getAllUsers = async (): Promise<{}> => {
   return Promise.resolve({ mesaage: "Get all Users" });
 };
 
-
+// Updates a user
 const updateUser = async (input: User): Promise<number> => {
   const [result] = await DB.update(user)
     .set(input)
@@ -60,10 +63,12 @@ const updateUser = async (input: User): Promise<number> => {
   return result.userId;
 };
 
+// Deletes a user
 const deleteUser = async (input: any): Promise<{}> => {
-  return Promise.resolve({ message: "Delete User" });
+  return Promise.resolve({ message: "Deleted User" });
 };
 
+// UserRepository object containing all the functions
 export const UserRepository: UserRepositoryType = {
   createUser,
   findUser,

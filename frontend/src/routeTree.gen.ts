@@ -11,12 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as VerificationRouteImport } from './routes/verification/route'
 import { Route as SignUpRouteImport } from './routes/sign-up/route'
 import { Route as SignInRouteImport } from './routes/sign-in/route'
 import { Route as DashboardRouteImport } from './routes/dashboard/route'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const VerificationRouteRoute = VerificationRouteImport.update({
+  path: '/verification',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const SignUpRouteRoute = SignUpRouteImport.update({
   path: '/sign-up',
@@ -70,6 +76,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignUpRouteImport
       parentRoute: typeof rootRoute
     }
+    '/verification': {
+      id: '/verification'
+      path: '/verification'
+      fullPath: '/verification'
+      preLoaderRoute: typeof VerificationRouteImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -80,6 +93,7 @@ export const routeTree = rootRoute.addChildren({
   DashboardRouteRoute,
   SignInRouteRoute,
   SignUpRouteRoute,
+  VerificationRouteRoute,
 })
 
 /* prettier-ignore-end */
@@ -93,7 +107,8 @@ export const routeTree = rootRoute.addChildren({
         "/",
         "/dashboard",
         "/sign-in",
-        "/sign-up"
+        "/sign-up",
+        "/verification"
       ]
     },
     "/": {
@@ -107,6 +122,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/sign-up": {
       "filePath": "sign-up/route.tsx"
+    },
+    "/verification": {
+      "filePath": "verification/route.tsx"
     }
   }
 }

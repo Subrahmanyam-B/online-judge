@@ -27,6 +27,7 @@ export const AuthPayloadSchema = Type.Object({
   id: Type.Integer(),
   email: Type.String(),
   verified: Type.Boolean(),
+  role: Type.String()
 });
 
 export type AuthPayload = Static<typeof AuthPayloadSchema>;

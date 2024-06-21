@@ -15,6 +15,13 @@
       "when": 1718701707747,
       "tag": "0001_broken_micromax",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1718946192936,
+      "tag": "0002_thick_sunspot",
+      "breakpoints": true
     }
   ]
 }

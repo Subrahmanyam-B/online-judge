@@ -25,12 +25,6 @@ router.post(
         return res.status(404).json({ error });
       }
       const response = await service.CreateUser(req.body as SignupInput, repo);
-      res.cookie('refreshToken', response.refreshToken, {
-        httpOnly: true, //accessible only by web server 
-        secure: true, //https
-        sameSite: "none",
-        maxAge: 30 * 24 * 60 * 60 * 1000 //cookie expiry: set to match rT
-      })
       return res.status(200).json(response);
     } catch (error) {
       // Handle other errors
@@ -48,12 +42,6 @@ router.post(
         return res.status(404).json({ error });
       }
       const response = await service.UserLogin(req.body, repo);
-      res.cookie('refreshToken', response.refreshToken, {
-        httpOnly: true, //accessible only by web server 
-        secure: true, //https
-        sameSite: "none",
-        maxAge: 30 * 24 * 60 * 60 * 1000 //cookie expiry: set to match rT
-      })
       logger.info("User Login")
       return res.status(200).json(response);
     } catch (error) {
