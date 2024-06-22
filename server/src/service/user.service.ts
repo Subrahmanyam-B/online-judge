@@ -10,7 +10,12 @@ import {
   ValidatePassword,
   logger,
 } from "../utils";
-import { AuthPayload, LoginInput, SignupInput, VerificationInput } from "../dto/user.dto";
+import {
+  AuthPayload,
+  LoginInput,
+  SignupInput,
+  VerificationInput,
+} from "../dto/user.dto";
 import { UserRepositoryType } from "../repository/user.repository";
 import { User } from "../db/schema";
 
@@ -43,34 +48,41 @@ export const CreateUser = async (
       id: newUser.id,
       email: newUser.email,
       verified: newUser.verified,
-      role: newUser.role
+      role: newUser.role,
     });
     const refreshToken = GenerateRefreshSignature({
       id: newUser.id,
       email: newUser.email,
       verified: newUser.verified,
-      role: newUser.role
+      role: newUser.role,
     });
 
-    logger.info("User Sign UP")
+    logger.info("User Sign UP");
 
     //send the result to the client
     return {
       accessToken: accessToken,
-      refreshToken: refreshToken
-    }
+      refreshToken: refreshToken,
+    };
   }
 
-  logger.error("Error with Sign Up")
-  throw new AuthorizeError("Unable to Sign Up")
+  logger.error("Error with Sign Up");
+  throw new AuthorizeError("Unable to Sign Up");
 };
 
-export const UserLogin = async (input: LoginInput, repo: UserRepositoryType) => {
+export const UserLogin = async (
+  input: LoginInput,
+  repo: UserRepositoryType
+) => {
   const { email, password } = input;
   const existingCustomer = await repo.findUser(email);
   if (!existingCustomer) throw new NotFoundError("User not found");
 
-  const validation = await ValidatePassword(password, existingCustomer.password, existingCustomer.salt);
+  const validation = await ValidatePassword(
+    password,
+    existingCustomer.password,
+    existingCustomer.salt
+  );
 
   console.log(validation);
 
@@ -90,13 +102,17 @@ export const UserLogin = async (input: LoginInput, repo: UserRepositoryType) => 
     //send the result to the client
     return {
       accessToken: accessToken,
-      refreshToken: refreshToken
-    }
+      refreshToken: refreshToken,
+    };
   }
-  return { message: "Validation issue" }
-}
+  return { message: "Validation issue" };
+};
 
-export const VerifyUser = async (user: AuthPayload, input: VerificationInput, repo: UserRepositoryType) => {
+export const VerifyUser = async (
+  user: AuthPayload,
+  input: VerificationInput,
+  repo: UserRepositoryType
+) => {
   const { verificationCode } = input;
   const existingCustomer = await repo.findUser(user.email);
   if (!existingCustomer) throw new NotFoundError("User not found");
@@ -108,11 +124,12 @@ export const VerifyUser = async (user: AuthPayload, input: VerificationInput, re
   } else {
     throw new ValidationError();
   }
+};
 
-}
-
-export const GetNewAccessToken = async (user: AuthPayload, repo: UserRepositoryType) => {
-
+export const GetNewAccessToken = async (
+  user: AuthPayload,
+  repo: UserRepositoryType
+) => {
   const accessToken = GenerateAccessSignature({
     id: user.id,
     email: user.email,
@@ -123,12 +140,14 @@ export const GetNewAccessToken = async (user: AuthPayload, repo: UserRepositoryT
   console.log("token", accessToken);
 
   return {
-    accessToken: accessToken
-  }
+    accessToken: accessToken,
+  };
+};
 
-}
-
-export const GetProfile = async (user: AuthPayload, repo: UserRepositoryType) => {
+export const GetProfile = async (
+  user: AuthPayload,
+  repo: UserRepositoryType
+) => {
   const data = await repo.getProfile(user.email);
   return data;
 };

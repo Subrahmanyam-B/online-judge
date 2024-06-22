@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { httpLogger, HandleErrorWithLogger } from "./utils";
 import userRoutes from "./routes/user.routes"
+import problemRoutes from "./routes/problems.routes"
 
 // var whitelist = ['http://localhost:5173', 'http://127.0.0.1:5173']
 // var corsOptions = {
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(httpLogger);
 
 //API Routes
+app.use(problemRoutes);
 app.use(userRoutes);
 
 app.use("/", (req: Request, res: Response, _: NextFunction) => {
