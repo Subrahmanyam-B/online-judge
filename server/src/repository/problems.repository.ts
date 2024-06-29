@@ -5,7 +5,7 @@ import { CreateProblemInput } from "../dto/problems.dto";
 
 export type ProblemsRepositoryType = {
   createProblem: (input: CreateProblemInput) => Promise<Problems>;
-  findProblem: (id: number) => Promise<{problem: Problems, testcase: Testcase[]}>;
+  findProblem: (id: number) => Promise<Problems>;
   getAllProblems: () => Promise<Problems[]>;
   updateProblem: (input: any) => Promise<{}>;
   deleteProblem: (id: number) => Promise<{}>;
@@ -39,11 +39,15 @@ const createProblem = async (input: CreateProblemInput): Promise<Problems> => {
   return result;
 };
 
-const findProblem = async (id: number): Promise<{problem: Problems, testcase: Testcase[]}> => {
-  const [result] = await DB.select().from(problem).where(eq(problem.id, id));
-  const testcases= await DB.select().from(testcase).where(eq(testcase.problemId, id));
+const findProblem = async (id: number): Promise<Problems> => {
+  const result = await DB.query.problem.findFirst({
+    where:eq(problem.id, id),
+    with: {
+      testcase : true
+    }
+  })
 
-  return {problem: result, testcase: testcases};
+  return result;
 };
 
 const getAllProblems = async (): Promise<Problems[]> => {

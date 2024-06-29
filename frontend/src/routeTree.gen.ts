@@ -12,8 +12,12 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as VerificationRouteImport } from './routes/verification/route'
+import { Route as SubmissionsRouteImport } from './routes/submissions/route'
 import { Route as SignUpRouteImport } from './routes/sign-up/route'
 import { Route as SignInRouteImport } from './routes/sign-in/route'
+import { Route as ProfileRouteImport } from './routes/profile/route'
+import { Route as ProblemsRouteImport } from './routes/problems/route'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard/route'
 import { Route as DashboardRouteImport } from './routes/dashboard/route'
 import { Route as IndexImport } from './routes/index'
 
@@ -24,6 +28,11 @@ const VerificationRouteRoute = VerificationRouteImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const SubmissionsRouteRoute = SubmissionsRouteImport.update({
+  path: '/submissions',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const SignUpRouteRoute = SignUpRouteImport.update({
   path: '/sign-up',
   getParentRoute: () => rootRoute,
@@ -31,6 +40,21 @@ const SignUpRouteRoute = SignUpRouteImport.update({
 
 const SignInRouteRoute = SignInRouteImport.update({
   path: '/sign-in',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProfileRouteRoute = ProfileRouteImport.update({
+  path: '/profile',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProblemsRouteRoute = ProblemsRouteImport.update({
+  path: '/problems',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LeaderboardRouteRoute = LeaderboardRouteImport.update({
+  path: '/leaderboard',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -62,6 +86,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRoute
     }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/problems': {
+      id: '/problems'
+      path: '/problems'
+      fullPath: '/problems'
+      preLoaderRoute: typeof ProblemsRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRoute
+    }
     '/sign-in': {
       id: '/sign-in'
       path: '/sign-in'
@@ -74,6 +119,13 @@ declare module '@tanstack/react-router' {
       path: '/sign-up'
       fullPath: '/sign-up'
       preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/submissions': {
+      id: '/submissions'
+      path: '/submissions'
+      fullPath: '/submissions'
+      preLoaderRoute: typeof SubmissionsRouteImport
       parentRoute: typeof rootRoute
     }
     '/verification': {
@@ -91,8 +143,12 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
   DashboardRouteRoute,
+  LeaderboardRouteRoute,
+  ProblemsRouteRoute,
+  ProfileRouteRoute,
   SignInRouteRoute,
   SignUpRouteRoute,
+  SubmissionsRouteRoute,
   VerificationRouteRoute,
 })
 
@@ -106,8 +162,12 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/",
         "/dashboard",
+        "/leaderboard",
+        "/problems",
+        "/profile",
         "/sign-in",
         "/sign-up",
+        "/submissions",
         "/verification"
       ]
     },
@@ -117,11 +177,23 @@ export const routeTree = rootRoute.addChildren({
     "/dashboard": {
       "filePath": "dashboard/route.tsx"
     },
+    "/leaderboard": {
+      "filePath": "leaderboard/route.tsx"
+    },
+    "/problems": {
+      "filePath": "problems/route.tsx"
+    },
+    "/profile": {
+      "filePath": "profile/route.tsx"
+    },
     "/sign-in": {
       "filePath": "sign-in/route.tsx"
     },
     "/sign-up": {
       "filePath": "sign-up/route.tsx"
+    },
+    "/submissions": {
+      "filePath": "submissions/route.tsx"
     },
     "/verification": {
       "filePath": "verification/route.tsx"

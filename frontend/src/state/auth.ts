@@ -1,10 +1,16 @@
+import { AuthPayload } from "@/lib/auth";
 import { atom } from "recoil";
-import { getCookie } from "typescript-cookie";
+import {recoilPersist} from'recoil-persist';
 
-const authAtom = atom<string>({
+const { persistAtom } = recoilPersist({
+  key: 'recoil-persist', // this is the key for localStorage
+  storage: sessionStorage, // or `localStorage`, default is `localStorage`
+});
+
+const authAtom = atom<{isAuthenticated: boolean , user : AuthPayload | null}>({
   key: "auth",
-  // get initial state from local storage to enable user to stay logged in
-  default: getCookie("accessToken") || "",
+  default: { isAuthenticated: false , user : null},
+  effects_UNSTABLE: [persistAtom],
 });
 
 export { authAtom };

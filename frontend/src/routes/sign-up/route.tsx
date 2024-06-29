@@ -8,11 +8,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { AuthPayload, ValidateSignature } from "@/lib/auth";
 import { authAtom } from "@/state/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -47,11 +49,14 @@ const formSchema = z.object({
 
 const SignUpForm = () => {
   const router = useRouter();
-  const auth = useRecoilValue(authAtom);
 
-  if (auth !== "") {
-    router.history.push("/dashboard");
-  }
+  const [auth, setAuth] = useRecoilState(authAtom);
+
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      router.history.push('/dashboard');
+    }
+  }, [auth, router])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -68,14 +73,25 @@ const SignUpForm = () => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     try {
-      const response = await register(
+      register(
         values.firstName,
         values.lastName,
         values.displayName,
         values.email,
         values.password
-      );
-      console.log(response);
+      )        .then((response) => {
+        if (response.accessToken) {
+          return ValidateSignature();
+        }
+        throw new Error("SignUp failed");
+      })
+      .then((payload: AuthPayload | false) => {
+        if (payload) {
+          setAuth({ isAuthenticated: true, user: payload })
+          router.history.push("/dashboard");
+        }
+      });
+      
       router.history.push("/dashboard");
     } catch (error) {
       console.log(error);

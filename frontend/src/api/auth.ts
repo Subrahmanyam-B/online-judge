@@ -59,3 +59,7 @@ export const verify = async (
     });
 };
 
+export const getProfile = async () => {
+  return await api.get("/user").then((response) => response.data);
+};
+

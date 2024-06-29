@@ -1,5 +1,4 @@
-import instance from "@/api/axios";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 // import api from "../../api/axios";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,6 +25,10 @@ import {
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
+import { useQuery } from "@tanstack/react-query";
+import { getProfile } from "@/api/auth";
+import { useRecoilValue } from "recoil";
+import { authAtom } from "@/state/auth";
 
 export function CalendarDemo() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -246,15 +249,27 @@ const ProgressHome = () => {
 };
 
 const Dashboard = () => {
+
+  const router = useRouter();
+
+  const auth = useRecoilValue(authAtom);
+
   useEffect(() => {
-    const fetch = async () => {
-      console.log("cache");
-      return await instance.get("/user").then((response) => {
-        console.log(response.data);
-      });
-    };
-    fetch();
-  }, []);
+    if (!auth.isAuthenticated) {
+      router.history.push('/sign-in');
+    }
+  }, [auth, router])
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['get-profile'],
+    queryFn: getProfile,
+  })
+
+  console.log(data);
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <div className="p-10">
