@@ -24,3 +24,10 @@ export const updateAccessToken = (token: string) => {
 export const updateRefreshToken = (token: string) => {
   setCookie("refreshToken", token);
 };
+export const removeAccessToken = () => {
+  setCookie("accessToken", "")
+}
+
+export const removeRefreshToken = () => {
+  setCookie("refreshToken", "")
+}

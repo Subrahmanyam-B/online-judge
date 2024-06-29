@@ -20,6 +20,7 @@ import { Route as ProblemsRouteImport } from './routes/problems/route'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard/route'
 import { Route as DashboardRouteImport } from './routes/dashboard/route'
 import { Route as IndexImport } from './routes/index'
+import { Route as ProblemProblemIdImport } from './routes/problem/$problemId'
 
 // Create/Update Routes
 
@@ -65,6 +66,11 @@ const DashboardRouteRoute = DashboardRouteImport.update({
 
 const IndexRoute = IndexImport.update({
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProblemProblemIdRoute = ProblemProblemIdImport.update({
+  path: '/problem/$problemId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -135,6 +141,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerificationRouteImport
       parentRoute: typeof rootRoute
     }
+    '/problem/$problemId': {
+      id: '/problem/$problemId'
+      path: '/problem/$problemId'
+      fullPath: '/problem/$problemId'
+      preLoaderRoute: typeof ProblemProblemIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -150,6 +163,7 @@ export const routeTree = rootRoute.addChildren({
   SignUpRouteRoute,
   SubmissionsRouteRoute,
   VerificationRouteRoute,
+  ProblemProblemIdRoute,
 })
 
 /* prettier-ignore-end */
@@ -168,7 +182,8 @@ export const routeTree = rootRoute.addChildren({
         "/sign-in",
         "/sign-up",
         "/submissions",
-        "/verification"
+        "/verification",
+        "/problem/$problemId"
       ]
     },
     "/": {
@@ -197,6 +212,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/verification": {
       "filePath": "verification/route.tsx"
+    },
+    "/problem/$problemId": {
+      "filePath": "problem/$problemId.tsx"
     }
   }
 }

@@ -16,14 +16,20 @@ const RootComponent = () => {
     },
   });
 
+  const pathName = window.location.pathname;
+  const isVisible = pathName!== '/sign-in' && pathName!== '/sign-up' && pathName!== '/verification' && pathName!== '/verify-email' && pathName!== '/forgot-password' && pathName!== '/';
+
+
   return (
     <RecoilRoot>
       <DebugObserver />
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           <div className="flex w-full">
-            <Sidebar />
-        <div className="w-4/5"><Outlet/></div>
+            {isVisible && <Sidebar />}
+            <div className="w-full">
+              <Outlet />
+            </div>
           </div>
           {/* <TanStackRouterDevtools /> */}
           <Toaster />

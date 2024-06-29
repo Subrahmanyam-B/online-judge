@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   ListChecks,
   LogOutIcon,
+  Settings,
   Trophy,
   User,
 } from "lucide-react";
@@ -11,6 +12,9 @@ import Logo from "../assets/Logo.svg";
 import { Command, CommandGroup, CommandItem, CommandList } from "./ui/command";
 import { Button } from "./ui/button";
 import { Link } from "@tanstack/react-router";
+import { useRecoilState } from "recoil";
+import { authAtom } from "@/state/auth";
+import { removeAccessToken, removeRefreshToken } from "@/lib/utils";
 
 function UserItem() {
   const navLinks = [{ name: "AlgoArena" }];
@@ -32,6 +36,16 @@ function UserItem() {
 }
 
 export default function Sidebar() {
+
+  const [ auth , setAuth] = useRecoilState(authAtom);
+
+  async function logout() {
+    removeAccessToken();
+    removeRefreshToken();
+    setAuth({isAuthenticated: false, user: null});
+  }
+
+
   const menuList = [
     {
       group: "General",
@@ -70,6 +84,19 @@ export default function Sidebar() {
     },
   ];
 
+  const adminList = [
+    {
+      group: "Admin Settings",
+      items: [
+        {
+          link: "/admin",
+          icon: <Settings />,
+          text: "Manage",
+        },
+      ],
+    }
+  ]
+
   return (
     <div className="flex flex-col gap-4 w-[300px] min-w-[300px] border-r min-h-screen p-4">
       <div>
@@ -78,10 +105,25 @@ export default function Sidebar() {
       <div className="grow">
         <Command style={{ overflow: "visible" }}>
           <CommandList style={{ overflow: "visible" }}>
+          {auth.user?.role === 'admin' && adminList.map((menu: any, key: number) => (
+              <CommandGroup key={key} heading={menu.group}>
+                {menu.items.map((option: any, optionKey: number) => (
+                  <Link to={option.link} key={optionKey}>
+                    <CommandItem
+                      key={optionKey}
+                      className="flex gap-2 cursor-pointer"
+                    >
+                      {option.icon}
+                      {option.text}
+                    </CommandItem>
+                  </Link>
+                ))}
+              </CommandGroup>
+            ))}
             {menuList.map((menu: any, key: number) => (
               <CommandGroup key={key} heading={menu.group}>
                 {menu.items.map((option: any, optionKey: number) => (
-                  <Link to={option.link}>
+                  <Link to={option.link} key={optionKey}>
                     <CommandItem
                       key={optionKey}
                       className="flex gap-2 cursor-pointer"
@@ -96,7 +138,7 @@ export default function Sidebar() {
           </CommandList>
         </Command>
       </div>
-      <Button variant="outline" className="flex justify-center gap-4">
+      <Button variant="outline" className="flex justify-center gap-4" onClick={logout}>
         <p>Logout </p>
         <LogOutIcon className="h-4 w-4" />
       </Button>
