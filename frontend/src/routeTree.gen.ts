@@ -19,6 +19,7 @@ import { Route as ProfileRouteImport } from './routes/profile/route'
 import { Route as ProblemsRouteImport } from './routes/problems/route'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard/route'
 import { Route as DashboardRouteImport } from './routes/dashboard/route'
+import { Route as AdminRouteImport } from './routes/admin/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as ProblemProblemIdImport } from './routes/problem/$problemId'
 
@@ -64,6 +65,11 @@ const DashboardRouteRoute = DashboardRouteImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AdminRouteRoute = AdminRouteImport.update({
+  path: '/admin',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
@@ -83,6 +89,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRoute
     }
     '/dashboard': {
@@ -155,6 +168,7 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
+  AdminRouteRoute,
   DashboardRouteRoute,
   LeaderboardRouteRoute,
   ProblemsRouteRoute,
@@ -175,6 +189,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/admin",
         "/dashboard",
         "/leaderboard",
         "/problems",
@@ -188,6 +203,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/admin": {
+      "filePath": "admin/route.tsx"
     },
     "/dashboard": {
       "filePath": "dashboard/route.tsx"

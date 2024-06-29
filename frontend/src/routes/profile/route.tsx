@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -31,6 +31,9 @@ import {
 } from "@tanstack/react-query";
 import { getProfile, updateProfile } from "@/api/auth";
 import { toast } from "@/components/ui/use-toast";
+import { useRecoilValue } from "recoil";
+import { authAtom } from "@/state/auth";
+import { useEffect } from "react";
 
 type ProfileData = {
   firstName: string;
@@ -40,6 +43,17 @@ type ProfileData = {
 };
 
 function ProfileSettings() {
+
+  const router = useRouter();
+
+  const auth = useRecoilValue(authAtom);
+
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      router.history.push('/sign-in');
+    }
+  }, [auth, router])
+
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["get-profile"],
     queryFn: getProfile,
@@ -67,7 +81,7 @@ function ProfileSettings() {
         <div className="space-y-8">
           <Card>
             <CardHeader>General Info</CardHeader>
-            <CardContent>
+            <CardContent className="">
               <MyForm data={data} refetch={refetch} />
             </CardContent>
           </Card>
