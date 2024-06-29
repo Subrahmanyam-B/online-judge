@@ -62,3 +62,23 @@ export const verify = async (
 export const getProfile = async () => {
   return await api.get("/user").then((response) => response.data);
 };
+
+type UpdateProfileData = {
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  email: string;
+};
+
+export const updateProfile = async (
+values  : UpdateProfileData
+) => {
+  return await api
+    .patch("/user", {
+      firstName : values.firstName,
+      lastName : values.lastName,
+      displayName : values.displayName,
+      email : values.email,
+    })
+    .then((response) => response.data);
+};

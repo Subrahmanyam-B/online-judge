@@ -8,7 +8,7 @@ export type UserRepositoryType = {
   findUser: (email: string) => Promise<User>; // Finds a user by email
   getProfile: (email: string) => Promise<User>; // Gets a user's profile by email
   getAllUsers: () => Promise<{}>; // Gets all users
-  updateUser: (updateUserInput: User) => Promise<number>; // Updates a user
+  updateUser: (updateUserInput: User , id: number) => Promise<number>; // Updates a user
   deleteUser: (deleteUserInput: User) => Promise<{}>; // Deletes a user
 };
 
@@ -54,10 +54,10 @@ const getAllUsers = async (): Promise<{}> => {
 };
 
 // Updates a user
-const updateUser = async (input: User): Promise<number> => {
+const updateUser = async (input: User , id: number): Promise<number> => {
   const [result] = await DB.update(user)
     .set(input)
-    .where(eq(user.id, input.id))
+    .where(eq(user.id, id))
     .returning({ userId: user.id });
 
   return result.userId;

@@ -24,8 +24,13 @@ const formSchema = z.object({
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useQuery } from "@tanstack/react-query";
-import { getProfile } from "@/api/auth";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  useQuery,
+} from "@tanstack/react-query";
+import { getProfile, updateProfile } from "@/api/auth";
+import { toast } from "@/components/ui/use-toast";
 
 type ProfileData = {
   firstName: string;
@@ -35,7 +40,7 @@ type ProfileData = {
 };
 
 function ProfileSettings() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["get-profile"],
     queryFn: getProfile,
   });
@@ -63,7 +68,7 @@ function ProfileSettings() {
           <Card>
             <CardHeader>General Info</CardHeader>
             <CardContent>
-              <MyForm data={data} />
+              <MyForm data={data} refetch={refetch} />
             </CardContent>
           </Card>
           <Card>
@@ -98,7 +103,16 @@ function ProfileSettings() {
   );
 }
 
-export function MyForm({ data }: { data: ProfileData }) {
+export function MyForm({
+  data,
+  refetch,
+}: {
+  data: ProfileData;
+  refetch: (
+    options?: RefetchOptions | undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ) => Promise<QueryObserverResult<any, Error>>;
+}) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -109,15 +123,14 @@ export function MyForm({ data }: { data: ProfileData }) {
     },
   });
 
-  if (data) {
-    form.setValue("firstName", data.firstName);
-    form.setValue("lastName", data.lastName);
-    form.setValue("email", data.email);
-    form.setValue("displayName", data.displayName);
-  }
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    await updateProfile(values);
+    toast({
+      title: "Profile Updated",
+      description: "Your profile has been updated successfully.",
+      variant: "default",
+    });
+    refetch();
   }
 
   return (

@@ -91,8 +91,9 @@ router.get("/user", Authenticate, async (req: Request, res: Response, next: Next
 
 router.patch(
   "/user",
+  Authenticate,
   async (req: Request, res: Response, next: NextFunction) => {
-    const response = await service.UpdateProfile(req.body, repo);
+    const response = await service.UpdateProfile(req.body, req.user,  repo);
     return res.status(200).json(response);
   }
 );

@@ -119,7 +119,7 @@ export const VerifyUser = async (
 
   if (existingCustomer.verificationCode === verificationCode) {
     existingCustomer.verified = true;
-    const data = await repo.updateUser(existingCustomer);
+    const data = await repo.updateUser(existingCustomer, existingCustomer.id);
     return data;
   } else {
     throw new ValidationError();
@@ -152,8 +152,8 @@ export const GetProfile = async (
   return data;
 };
 
-export const UpdateProfile = async (input: any, repo: UserRepositoryType) => {
-  const data = await repo.updateUser(input);
+export const UpdateProfile = async (input: any, user : AuthPayload,  repo: UserRepositoryType) => {
+  const data = await repo.updateUser(input, user.id);
   return data;
 };
 
