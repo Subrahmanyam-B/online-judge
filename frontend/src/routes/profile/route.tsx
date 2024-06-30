@@ -14,13 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-const formSchema = z.object({
-  firstName: z.string().min(1).max(255),
-  lastName: z.string().min(1).max(255),
-  email: z.string().email().min(1).max(255),
-  displayName: z.string().min(1).max(255),
-});
-
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -35,6 +28,13 @@ import { useRecoilValue } from "recoil";
 import { authAtom } from "@/state/auth";
 import { useEffect } from "react";
 
+const formSchema = z.object({
+  firstName: z.string().min(1).max(255),
+  lastName: z.string().min(1).max(255),
+  email: z.string().email().min(1).max(255),
+  displayName: z.string().min(1).max(255),
+});
+
 type ProfileData = {
   firstName: string;
   lastName: string;
@@ -43,16 +43,15 @@ type ProfileData = {
 };
 
 function ProfileSettings() {
-
   const router = useRouter();
 
   const auth = useRecoilValue(authAtom);
 
   useEffect(() => {
     if (!auth.isAuthenticated) {
-      router.history.push('/sign-in');
+      router.history.push("/sign-in");
     }
-  }, [auth, router])
+  }, [auth, router]);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["get-profile"],
@@ -124,7 +123,7 @@ export function MyForm({
   data: ProfileData;
   refetch: (
     options?: RefetchOptions | undefined
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) => Promise<QueryObserverResult<any, Error>>;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({

@@ -29,6 +29,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProfile } from "@/api/auth";
 import { useRecoilValue } from "recoil";
 import { authAtom } from "@/state/auth";
+// import { CardsStats } from "@/components/stats";
 
 export function CalendarDemo() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -275,7 +276,9 @@ const Dashboard = () => {
     <div className="p-10">
       <h1 className="text-4xl font-bold">Dashboard</h1>
       <div className="flex justify-end pb-10 gap-10 w-full">
+        {/* <CardsStats/> */}
         <ProgressHome />
+
         <CalendarDemo />
       </div>
       <div className="flex w-full gap-10">
