@@ -15,6 +15,13 @@
       "when": 1719034415870,
       "tag": "0001_quick_lilandra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1719919792199,
+      "tag": "0002_cultured_gamma_corps",
+      "breakpoints": true
     }
   ]
 }

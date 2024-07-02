@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { DB } from "../db/db.connection";
-import { Submission, submission, submissionStatusEnum } from "../db/schema/submissions";
+import { Submission, SubmissionStatus, submission } from "../db/schema/submissions";
 import { CreateSubmissionInput, UpdateSubmissionInput } from "../dto/submission.dto";
 
 export type SubmissionRepositoryType = {
@@ -19,7 +19,7 @@ const createSubmission = async (input: CreateSubmissionInput): Promise<Submissio
     .values({
       userId: input.userId,
       problemId: input.problemId,
-      languageId: input.languageId,
+      languageId: parseInt(input.languageId),
       code: input.code,
       status: "Pending",
     })
@@ -57,8 +57,9 @@ const getSubmissionByProblemIdAdmin = async (problemId: number): Promise<Submiss
 }
 
 const getSubmissionByProblemIdUser = async (problemId: number, userId: number): Promise<Submission[]> => {
+  console.log(problemId, userId);
   const result = await DB.query.submission.findMany({
-    where: eq(submission.problemId, problemId) && eq(submission.userId, userId),
+    where: and(eq(submission.problemId, problemId), eq(submission.userId, userId)),
   })
 
   return result;
@@ -73,8 +74,8 @@ const deleteSubmission = async (id: number): Promise<{}> => {
 const updateSubmission = async (input: UpdateSubmissionInput): Promise<Submission> => {
   const [result] = await DB.update(submission)
     .set({
-      status: input.status as any,
-      runtime: input.runtime,
+      status: input.status as SubmissionStatus,
+      runtime: Math.round(input.runtime),
       testcaseResults: input.testcaseResults,
     })
     .where(eq(submission.id, input.id))

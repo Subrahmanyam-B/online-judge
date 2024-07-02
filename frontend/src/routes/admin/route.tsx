@@ -1,20 +1,67 @@
-import { createProblem } from "@/api/problems";
+import { createProblem, getProblems } from "@/api/problems";
 import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
 import { authAtom } from "@/state/auth";
 import { manageSidebarAtom } from "@/state/manage-sidebar";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { LayoutDashboard } from "lucide-react";
+import { ExternalLink, LayoutDashboard, Link, Table } from "lucide-react";
 import { useEffect } from "react";
+import { Button } from "react-day-picker";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { z } from "zod";
 
+type ProblemData = {
+  id: number;
+  title: string;
+  difficulty: string;
+  // tags: string[];
+  createdBy: string;
+  createdAt: string;
+};
 
 const UpdateProblemCard = () => {
+
+  const {data, isLoading} = useQuery({
+    queryKey: ["get-problems"],
+    queryFn: getProblems,
+  });
+
+  if(isLoading) return <div>Loading...</div>;
+
+
   return (
-    <div>UpdateProblemCard</div>
+    <div>
+              <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Difficulty</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+          {data.map((problem : ProblemData, index : number) => (
+            <TableRow key={index}>
+            <TableCell>
+              <div className="font-medium">{problem.title}</div>
+            </TableCell>
+            <TableCell>{problem.difficulty}</TableCell>
+            <TableCell>
+              <Link to={"/problem/" + problem.id}>
+                <Button>
+                  Solve <ExternalLink className="h-4 w-4 ml-4" />
+                </Button>
+              </Link>
+            </TableCell>
+          </TableRow>
+          ))}
+          </TableBody>
+        </Table>
+    </div>
   )
 }
 
@@ -129,8 +176,10 @@ const AdminPage = () => {
         <Card className="p-8 w-1/5">
           <Command style={{ overflow: "visible" }}>
             <CommandList style={{ overflow: "visible" }}>
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {auth.user?.role === 'admin' && problemManageList.map((menu: any, key: number) => (
                 <CommandGroup key={key} heading={menu.group}>
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {menu.items.map((option: any, optionKey: number) => (
                     <CommandItem
                       key={optionKey}
@@ -169,35 +218,3 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-
-//   function validationTest(){
-//     try {
-//         const exampleInput = {
-//             title: "Sample Problem",
-//             difficulty: "easy",
-//             desc: "This is a sample problem description.",
-//             input: "Input description here.",
-//             output: "Output description here.",
-//             constraints: "Constraints description here.",
-//             timeLimit: 1.5,
-//             testcases: [
-//               {
-//                 input: "test input 1",
-//                 expectedOutput: "expected output 1",
-//                 isSample: true,
-//                 explanation: "Explanation for test case 1"
-//               },
-//               {
-//                 input: "test input 2",
-//                 expectedOutput: "expected output 2",
-//                 isSample: false,
-//                 explanation: "Explanation for test case 2"
-//               },
-//             ],
-//           };
-//         createProblemInputSchema.parse(exampleInput);
-//         console.log("Validation successful!");
-//       } catch (e) {
-//         console.error("Validation failed:", e);
-//       }
-//   }

@@ -1,11 +1,11 @@
-import { createFileRoute, useParams } from "@tanstack/react-router";
+import { createFileRoute, useParams, useRouter } from "@tanstack/react-router";
 import { Editor } from "@monaco-editor/react";
 import {
   ResizablePanelGroup,
   ResizablePanel,
   ResizableHandle,
 } from "@/components/ui/resizable";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import Markdown from "markdown-to-jsx";
 import { codeAtom } from "@/state/code";
 import {
@@ -32,7 +32,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+// import { toast } from "@/components/ui/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -40,13 +40,35 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
-import { getProblemById, runCode } from "@/api/problems";
+import {
+  getProblemById,
+  getProblemSubmissions,
+  runCode,
+  submitCode,
+} from "@/api/problems";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { authAtom } from "@/state/auth";
 
 interface TextEditorProps {
   // language: Specifies the programming language for the editor. It must be one of the predefined options (although you can add more if you want)
   language: 1 | 2 | 3;
+  problemId: string;
+}
+
+interface SubmissionResponse {
+  status: string;
+  testcaseResults: {
+    status: string;
+  }[];
 }
 
 const FormSchema = z.object({
@@ -59,10 +81,18 @@ const FormSchema = z.object({
   input: z.string().optional(),
 });
 
-const TextEditor = ({ language }: TextEditorProps) => {
+const TextEditor = ({ language, problemId }: TextEditorProps) => {
   const [code, setCode] = useRecoilState(codeAtom);
   const [output, setOutput] = useState<string>("Output");
   const [isOutputLoading, setIsOutputLoading] = useState<boolean>(false);
+  const [isSubmissionLoading, setIsSubmissionLoading] =
+    useState<boolean>(false);
+  const [submissionResponse, setSubmissionResponse] =
+    useState<SubmissionResponse>();
+
+  useEffect(() => {
+    console.log(submissionResponse);
+  }, [submissionResponse]);
 
   const setBoilerPlateCode = (value: string) => {
     if (value === "1") {
@@ -77,7 +107,9 @@ int main() {
 
 }
 `);
-      form.setValue("code", `#include <bits/stdc++.h>
+      form.setValue(
+        "code",
+        `#include <bits/stdc++.h>
 using namespace std;
 
 int main() {
@@ -87,7 +119,8 @@ int main() {
   return 0;
 
 }
-`);
+`
+      );
     } else if (value === "3") {
       setCode(`print('Hello World')`);
       form.setValue("code", `print('Hello World')`);
@@ -99,13 +132,16 @@ int main() {
 
   }
 }`);
-      form.setValue("code", `public class Test {
+      form.setValue(
+        "code",
+        `public class Test {
   public static void main(String[] args) {
 
     System.out.println("Hello World");
 
   }
-}`);
+}`
+      );
     }
   };
 
@@ -119,14 +155,24 @@ int main() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setBoilerPlateCode("cpp"), []);
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    // toast({
+    //   title: "You submitted the following values:",
+    //   description: (
+    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+    //     </pre>
+    //   ),
+    // });
+    setIsSubmissionLoading(true);
+    await submitCode({
+      problemId: parseInt(problemId),
+      code: data.code,
+      languageId: data.languageId,
+    }).then((response) => {
+      console.log(response);
+      setIsSubmissionLoading(false);
+      setSubmissionResponse(response);
     });
   }
 
@@ -218,6 +264,34 @@ int main() {
             }}
           />
           <div>
+            {submissionResponse && submissionResponse.status === "Accepted" && (
+              <div className="text-green-600 text-2xl rounded-sm p-2">
+                {submissionResponse.status}
+              </div>
+            )}
+            {submissionResponse && submissionResponse.status !== "Accepted" && (
+              <div className="text-red-600 text-2xl rounded-sm p-2">
+                {submissionResponse.status}
+              </div>
+            )}
+            <div className="flex gap-2 p-2 flex-wrap">
+              {submissionResponse &&
+                submissionResponse?.testcaseResults?.map((testcase, index) => (
+                  <div className="">
+                    {testcase.status === "Passed" ? (
+                      <div className="bg-green-600 text-white rounded-sm p-2">
+                        Testcase {index + 1}
+                      </div>
+                    ) : (
+                      <div className="bg-red-600 rounded-sm p-2">
+                        Testcase {index + 1}
+                      </div>
+                    )}
+                  </div>
+                ))}
+            </div>
+          </div>
+          <div>
             <Accordion type="single" collapsible>
               <AccordionItem value="item-1">
                 <AccordionTrigger>Console</AccordionTrigger>
@@ -256,7 +330,11 @@ int main() {
             >
               Run
             </Button>
-            <Button type="submit" className="w-1/2">
+            <Button
+              type="submit"
+              disabled={isSubmissionLoading}
+              className="w-1/2"
+            >
               Submit
             </Button>
           </div>
@@ -266,12 +344,48 @@ int main() {
   );
 };
 
-const ProblemDetails = () => {
-  const params = useParams({ from: "/problem/$problemId" });
+const SubmissionsTableProblemPage = ({ problemId }: { problemId: string }) => {
+  const { data: submissions, isLoading } = useQuery({
+    queryKey: ["submissions"],
+    queryFn: () => getProblemSubmissions(problemId),
+  });
 
+  if (isLoading) return <div>Loading....</div>;
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Status</TableHead>
+          <TableHead>Submitted at</TableHead>
+          {/* <TableHead>Tags</TableHead> */}
+          <TableHead>Runtime</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {submissions.map(
+          (
+            submission: { status: string; createdAt: string; runtime: number },
+            index: number
+          ) => (
+            <TableRow key={index}>
+              <TableCell>
+                <div className="font-medium">{submission.status}</div>
+              </TableCell>
+              <TableCell>{submission.createdAt}</TableCell>
+              <TableCell>{submission.runtime}</TableCell>
+            </TableRow>
+          )
+        )}
+      </TableBody>
+    </Table>
+  );
+};
+
+const ProblemDetails = ({ problemId }: { problemId: string }) => {
   const { data: problemsData, isLoading } = useQuery({
     queryKey: ["get-problems-by-id"],
-    queryFn: () => getProblemById(params.problemId),
+    queryFn: () => getProblemById(problemId),
   });
 
   if (isLoading) return <div>Loading...</div>;
@@ -286,27 +400,31 @@ const ProblemDetails = () => {
       </TabsList>
       <TabsContent value="problem">
         <div className="py-8">
-          <div className="text-3xl font-bold">{problemsData?.title}</div>
-          <Badge className="mt-4 text-sm">{problemsData?.difficulty}</Badge>
+          <div className="text-3xl font-bold">
+            {problemsData?.problem?.title}
+          </div>
+          <Badge className="mt-4 text-sm">
+            {problemsData?.problem?.difficulty}
+          </Badge>
           <div className="mt-4 text-sm">
-            <Markdown>{problemsData?.desc || ""}</Markdown>
+            <Markdown>{problemsData?.problem?.desc || ""}</Markdown>
           </div>
           <div className="mt-8">
             <h4 className="text-xl font-semibold underline">Input:</h4>
             <div className="mt-4 text-sm">
-              <Markdown>{problemsData?.input || ""}</Markdown>
+              <Markdown>{problemsData?.problem?.input || ""}</Markdown>
             </div>
           </div>
           <div className="mt-8">
             <h4 className="text-xl font-semibold underline">Output:</h4>
             <div className="mt-4 text-sm">
-              <Markdown>{problemsData?.output || ""}</Markdown>
+              <Markdown>{problemsData?.problem?.output || ""}</Markdown>
             </div>
           </div>
           <div className="mt-8">
             <h4 className="text-xl font-semibold underline">Examples:</h4>
             <div className="mt-4 text-sm">
-              {problemsData?.testcase.map((testcase, index) => (
+              {problemsData?.testcases?.map((testcase, index) => (
                 <div key={index}>
                   <h4 className="text-lg font-semibold">
                     Sample {index + 1} :
@@ -326,12 +444,26 @@ const ProblemDetails = () => {
           </div>
         </div>
       </TabsContent>
-      <TabsContent value="submission">No Data Available</TabsContent>
+      <TabsContent value="submission">
+        <SubmissionsTableProblemPage problemId={problemId} />
+      </TabsContent>
     </Tabs>
   );
 };
 
 const ProblemPage = () => {
+
+  const router = useRouter();
+
+  const auth = useRecoilValue(authAtom);
+
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      router.history.push('/sign-in');
+    }
+  }, [auth, router])
+
+  const params = useParams({ from: "/problem/$problemId" });
   return (
     <ResizablePanelGroup
       direction="horizontal"
@@ -339,13 +471,13 @@ const ProblemPage = () => {
     >
       <ResizablePanel defaultSize={50}>
         <div className="flex items-center justify-center p-6">
-          <ProblemDetails />
+          <ProblemDetails problemId={params.problemId} />
         </div>
       </ResizablePanel>
       <ResizableHandle />
       <ResizablePanel defaultSize={50}>
         <div className="flex items-center justify-center p-6">
-          <TextEditor language={1} />
+          <TextEditor language={1} problemId={params.problemId} />
         </div>
       </ResizablePanel>
       <ResizableHandle />

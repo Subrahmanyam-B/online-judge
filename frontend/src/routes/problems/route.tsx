@@ -9,9 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { authAtom } from "@/state/auth";
 import { useQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
 import { ExternalLink } from "lucide-react";
+import { useEffect } from "react";
+import { useRecoilValue } from "recoil";
 
 type ProblemData = {
   id: number;
@@ -23,6 +26,15 @@ type ProblemData = {
 };
 
 const Problems = () => {
+  const router = useRouter();
+
+  const auth = useRecoilValue(authAtom);
+
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      router.history.push('/sign-in');
+    }
+  }, [auth, router])
 
   const {data, isLoading} = useQuery({
     queryKey: ["get-problems"],

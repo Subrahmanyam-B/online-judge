@@ -7,7 +7,15 @@ export const getProblems = async () => {
 export const getProblemById = async (id: string) => {
   return (await api
     .get("/problem/" + id)
-    .then((response) => response.data)) as GetProblem;
+    .then((response) => response.data)) as {
+    problem: GetProblem;
+    testcases: {
+      input: string;
+      expectedOutput: string;
+      isSample: boolean;
+      explanation: string;
+    }[];
+  };
 };
 
 type GetProblem = {
@@ -59,4 +67,19 @@ export const runCode = async (values: RunCodeInput) => {
     .catch((err) => {
       console.log(err);
     });
+};
+
+type SubmitCodeInput = {
+  problemId: number;
+  languageId: string;
+  code: string;
+};
+
+export const submitCode = async (values : SubmitCodeInput) => {
+  return await api.post("/submit", values).then((response) => response.data);
+};
+
+
+export const getProblemSubmissions = async (id: string) => {
+  return await api.get("/submissions/" + id).then((response) => response.data);
 };

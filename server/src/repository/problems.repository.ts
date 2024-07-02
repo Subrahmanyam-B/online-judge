@@ -5,10 +5,15 @@ import { CreateProblemInput } from "../dto/problems.dto";
 
 export type ProblemsRepositoryType = {
   createProblem: (input: CreateProblemInput) => Promise<Problems>;
-  findProblem: (id: number) => Promise<Problems>;
+  findProblem: (id: number) => Promise<findProblemOutput>;
   getAllProblems: () => Promise<Problems[]>;
   updateProblem: (input: any) => Promise<{}>;
   deleteProblem: (id: number) => Promise<{}>;
+};
+
+type findProblemOutput = {
+  problem: Problems;
+  testcases: Testcase[];
 };
 
 const createProblem = async (input: CreateProblemInput): Promise<Problems> => {
@@ -39,7 +44,7 @@ const createProblem = async (input: CreateProblemInput): Promise<Problems> => {
   return result;
 };
 
-const findProblem = async (id: number): Promise<Problems> => {
+const findProblem = async (id: number): Promise<findProblemOutput> => {
   const result = await DB.query.problem.findFirst({
     where:eq(problem.id, id),
     with: {
@@ -47,7 +52,10 @@ const findProblem = async (id: number): Promise<Problems> => {
     }
   })
 
-  return result;
+  return {
+    problem: result,
+    testcases: result.testcase,
+  };
 };
 
 const getAllProblems = async (): Promise<Problems[]> => {

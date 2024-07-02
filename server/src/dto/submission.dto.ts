@@ -1,12 +1,12 @@
 import { Static, Type } from "@sinclair/typebox";
 
 export const CreateSubmissionSchema = Type.Object({
-  userId: Type.Number(),
+  userId: Type.Optional(Type.Number()),
   problemId: Type.Number(),
-  languageId: Type.Number(),
+  languageId: Type.String(),
   code: Type.String(),
-  status: Type.String(),
-  runtime: Type.Number(),
+  status: Type.Optional(Type.String()),
+  runtime:Type.Optional(Type.Number()),
   memoryUsage: Type.Optional(Type.Number()),
   testcaseResults: Type.Optional(
     Type.Array(

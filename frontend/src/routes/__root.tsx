@@ -25,10 +25,10 @@ const RootComponent = () => {
       <DebugObserver />
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <div className="flex w-full">
-            {isVisible && <Sidebar />}
-            <div className="w-full">
-              <Outlet />
+          <div className=" flex w-full">
+            <div>{isVisible && <Sidebar />}</div>
+            <div className="w-full h-full overflow-scroll">
+              <Outlet/>
             </div>
           </div>
           {/* <TanStackRouterDevtools /> */}

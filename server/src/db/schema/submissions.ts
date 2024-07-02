@@ -6,12 +6,14 @@ import { problem } from "./problems";
 export const submissionStatusEnum = pgEnum("submission_status", [
   "Pending",
   "Accepted",
-  "WrongAnswer",
+  "Failed",
   "TimeLimitExceeded",
   "MemoryLimitExceeded",
   "RuntimeError",
   "CompilationError",
 ]);
+
+export type SubmissionStatus = "Pending" | "Accepted" | "Failed" | "TimeLimitExceeded" | "MemoryLimitExceeded" | "RuntimeError" | "CompilationError";
 
 export interface ITestCaseResult {
   testCaseId: number;

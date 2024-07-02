@@ -1,12 +1,14 @@
 import express, { NextFunction, Request, Response } from 'express';
 import * as service from "../service/submission.service";
 import * as repository from "../repository/submission.repository";
+import * as problemRepository from "../repository/problems.repository";
 import { Authenticate } from '../middlewares';
 import { ValidateRequest } from '../utils';
 import { CreateSubmissionInput, CreateSubmissionSchema, RunCodeInput, RunCodeSchema } from '../dto/submission.dto';
 
 const router = express.Router();
 const repo = repository.SubmissionRepository;
+const problemRepo = problemRepository.ProblemsRepository;
 
 
 router.post(
@@ -21,7 +23,7 @@ router.post(
         return res.status(404).json({ error });
       }
 
-      const response = await service.CreateSubmission(req.body, req.user, repo);
+      const response = await service.CreateSubmission(req.body, req.user, repo, problemRepo);
       return res.status(200).json(response);
     } catch (error) {
       return res.status(404).json({ error });
@@ -63,7 +65,7 @@ router.get(
 );
 
 router.get(
-  "/problem/:problemId",
+  "/submissions/:problemId",
   Authenticate,
   async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {
