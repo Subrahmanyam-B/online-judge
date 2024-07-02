@@ -40,17 +40,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
-import { getProblemById } from "@/api/problems";
+import { getProblemById, runCode } from "@/api/problems";
 import { Badge } from "@/components/ui/badge";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface TextEditorProps {
   // language: Specifies the programming language for the editor. It must be one of the predefined options (although you can add more if you want)
-  language: "python" | "java" | "cpp";
+  language: 1 | 2 | 3;
 }
 
 const FormSchema = z.object({
-  language: z.string({
+  languageId: z.string({
     required_error: "Please select an email to display.",
   }),
   code: z.string({
@@ -61,9 +61,11 @@ const FormSchema = z.object({
 
 const TextEditor = ({ language }: TextEditorProps) => {
   const [code, setCode] = useRecoilState(codeAtom);
+  const [output, setOutput] = useState<string>("Output");
+  const [isOutputLoading, setIsOutputLoading] = useState<boolean>(false);
 
   const setBoilerPlateCode = (value: string) => {
-    if (value === "cpp") {
+    if (value === "1") {
       setCode(`#include <bits/stdc++.h>
 using namespace std;
 
@@ -75,10 +77,29 @@ int main() {
 
 }
 `);
-    } else if (value === "python") {
+      form.setValue("code", `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+
+  cout << "Hello World";
+
+  return 0;
+
+}
+`);
+    } else if (value === "3") {
       setCode(`print('Hello World')`);
-    } else if (value === "java") {
-      setCode(`public class Main {
+      form.setValue("code", `print('Hello World')`);
+    } else if (value === "2") {
+      setCode(`public class Test {
+  public static void main(String[] args) {
+
+    System.out.println("Hello World");
+
+  }
+}`);
+      form.setValue("code", `public class Test {
   public static void main(String[] args) {
 
     System.out.println("Hello World");
@@ -91,11 +112,12 @@ int main() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      language: "cpp",
-    }
+      languageId: "1",
+      code: code,
+    },
   });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(()=> setBoilerPlateCode("cpp"), [])
+  useEffect(() => setBoilerPlateCode("cpp"), []);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast({
@@ -108,18 +130,26 @@ int main() {
     });
   }
 
-  function onRunCode() {
-    const language = form.getValues("language");
+  async function onRunCode() {
+    const languageId = form.getValues("languageId");
     const code = form.getValues("code");
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">
-            {JSON.stringify({ language, code }, null, 2)}
-          </code>
-        </pre>
-      ),
+    const input = form.getValues("input");
+    // toast({
+    //   title: "You submitted the following values:",
+    //   description: (
+    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+    //       <code className="text-white">
+    //         "languageId" : {languageId},
+    //         "code" : {code},
+    //         "input" : {input}
+    //       </code>
+    //     </pre>
+    //   ),
+    // });
+    setIsOutputLoading(true);
+    await runCode({ input, languageId, code }).then((response) => {
+      setIsOutputLoading(false);
+      setOutput(response.output);
     });
   }
 
@@ -132,7 +162,7 @@ int main() {
         >
           <FormField
             control={form.control}
-            name="language"
+            name="languageId"
             render={({ field }) => {
               return (
                 <FormItem className="w-[180px]">
@@ -141,7 +171,7 @@ int main() {
                       field.onChange(value);
                       setBoilerPlateCode(value);
                     }}
-                    defaultValue={field.value}
+                    defaultValue={String(field.value)}
                   >
                     <FormControl>
                       <SelectTrigger className="">
@@ -151,9 +181,9 @@ int main() {
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Language</SelectLabel>
-                        <SelectItem value="cpp">C++</SelectItem>
-                        <SelectItem value="python">Python</SelectItem>
-                        <SelectItem value="java">Java</SelectItem>
+                        <SelectItem value="1">C++</SelectItem>
+                        <SelectItem value="2">Java</SelectItem>
+                        <SelectItem value="3">Python</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -163,7 +193,15 @@ int main() {
           />
           <Editor
             height="78vh"
-            defaultLanguage={language}
+            defaultLanguage={
+              language === 1
+                ? "cpp"
+                : language === 2
+                  ? "java"
+                  : language === 3
+                    ? "python"
+                    : ""
+            }
             value={code}
             onChange={(newValue) => {
               setCode(newValue || "");
@@ -199,7 +237,11 @@ int main() {
                         )}
                       />
                     </div>
-                    <Card className="w-1/2 p-2 text-slate-400">Output</Card>
+                    <Card className="w-1/2 p-2 text-slate-400">
+                      <Markdown>
+                        {isOutputLoading ? "Loading . . . " : output}
+                      </Markdown>
+                    </Card>
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -266,11 +308,17 @@ const ProblemDetails = () => {
             <div className="mt-4 text-sm">
               {problemsData?.testcase.map((testcase, index) => (
                 <div key={index}>
-                  <h4 className="text-lg font-semibold">Sample {index +1} :</h4>
+                  <h4 className="text-lg font-semibold">
+                    Sample {index + 1} :
+                  </h4>
                   <div className="pl-5 flex flex-col text-base pt-2">
-                  <Markdown>{`## **Input**:  `+ testcase?.input}</Markdown>
-                  <Markdown>{`## **Expected Output**:  `+ testcase?.expectedOutput}</Markdown>
-                  <Markdown>{`## **Explanation**: `+ testcase?.explanation}</Markdown>
+                    <Markdown>{`## **Input**:  ` + testcase?.input}</Markdown>
+                    <Markdown>
+                      {`## **Expected Output**:  ` + testcase?.expectedOutput}
+                    </Markdown>
+                    <Markdown>
+                      {`## **Explanation**: ` + testcase?.explanation}
+                    </Markdown>
                   </div>
                 </div>
               ))}
@@ -297,7 +345,7 @@ const ProblemPage = () => {
       <ResizableHandle />
       <ResizablePanel defaultSize={50}>
         <div className="flex items-center justify-center p-6">
-          <TextEditor language="cpp" />
+          <TextEditor language={1} />
         </div>
       </ResizablePanel>
       <ResizableHandle />

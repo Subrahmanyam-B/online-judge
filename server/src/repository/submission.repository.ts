@@ -8,6 +8,8 @@ export type SubmissionRepositoryType = {
   findSubmission: (id: number) => Promise<Submission>;
   getAllSubmission: () => Promise<Submission[]>;
   getSubmissionByUserId: (userId: number) => Promise<Submission[]>;
+  getSubmissionByProblemIdAdmin: (problemId: number) => Promise<Submission[]>;
+  getSubmissionByProblemIdUser: (problemId: number, userId: number) => Promise<Submission[]>;
   deleteSubmission: (id: number) => Promise<{}>;
   updateSubmission: (input: UpdateSubmissionInput) => Promise<Submission>;
 };
@@ -46,6 +48,22 @@ const getSubmissionByUserId = async (userId: number): Promise<Submission[]> => {
   return result;
 };
 
+const getSubmissionByProblemIdAdmin = async (problemId: number): Promise<Submission[]> => {
+  const result = await DB.query.submission.findMany({
+    where: eq(submission.problemId, problemId)
+  })
+
+  return result;
+}
+
+const getSubmissionByProblemIdUser = async (problemId: number, userId: number): Promise<Submission[]> => {
+  const result = await DB.query.submission.findMany({
+    where: eq(submission.problemId, problemId) && eq(submission.userId, userId),
+  })
+
+  return result;
+}
+
 const deleteSubmission = async (id: number): Promise<{}> => {
   await DB.delete(submission).where(eq(submission.id, id));
 
@@ -53,23 +71,25 @@ const deleteSubmission = async (id: number): Promise<{}> => {
 };
 
 const updateSubmission = async (input: UpdateSubmissionInput): Promise<Submission> => {
-    const [result] = await DB.update(submission)
-      .set({
-        status: input.status as any,
-        runtime: input.runtime,
-        testcaseResults: input.testcaseResults,
-      })
-      .where(eq(submission.id, input.id))
-      .returning();
-  
-    return result;
-  };
+  const [result] = await DB.update(submission)
+    .set({
+      status: input.status as any,
+      runtime: input.runtime,
+      testcaseResults: input.testcaseResults,
+    })
+    .where(eq(submission.id, input.id))
+    .returning();
+
+  return result;
+};
 
 export const SubmissionRepository: SubmissionRepositoryType = {
   createSubmission,
   findSubmission,
   getAllSubmission,
   getSubmissionByUserId,
+  getSubmissionByProblemIdAdmin,
+  getSubmissionByProblemIdUser,
   deleteSubmission,
   updateSubmission,
 };

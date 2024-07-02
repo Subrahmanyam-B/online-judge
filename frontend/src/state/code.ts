@@ -8,7 +8,17 @@ import { atom } from "recoil";
 
 const codeAtom = atom<string>({
   key: "code",
-  default: "",
+  default: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+
+  cout << "Hello World";
+
+  return 0;
+
+}
+`,
 });
 
 export { codeAtom };

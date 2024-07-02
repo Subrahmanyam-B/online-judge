@@ -21,6 +21,20 @@ export const CreateSubmissionSchema = Type.Object({
 
 export type CreateSubmissionInput = Static<typeof CreateSubmissionSchema>;
 
+export const RunCodeSchema = Type.Object({
+  languageId: Type.String(),
+  code: Type.String(),
+  input: Type.Optional(Type.String())
+})
+
+export type RunCodeInput = Static<typeof RunCodeSchema>;
+
+export interface RunCodeOutput {
+  status: number;
+  message: string;
+  output: string;
+}
+
 export const UpdateSubmissionSchema = Type.Object({
   id: Type.Number(),
   status: Type.Optional(Type.String()),

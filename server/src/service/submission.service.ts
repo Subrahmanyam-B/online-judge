@@ -1,7 +1,13 @@
 import { SubmissionRepositoryType } from "../repository/submission.repository";
 import { AuthPayload } from "../dto/user.dto";
 import { APIError, AuthorizeError, NotFoundError } from "../utils";
-import { CreateSubmissionInput, UpdateSubmissionInput } from "../dto/submission.dto";
+import {
+  CreateSubmissionInput,
+  RunCodeInput,
+  RunCodeOutput,
+  UpdateSubmissionInput,
+} from "../dto/submission.dto";
+import { RunCpp, RunJava, RunPython } from "../utils/code/ExecuteCode";
 
 export const CreateSubmission = async (
   input: CreateSubmissionInput,
@@ -27,6 +33,37 @@ export const CreateSubmission = async (
   throw new APIError("Error creating submission");
 };
 
+export const RunCode = async (
+  input: RunCodeInput,
+  user: AuthPayload
+): Promise<RunCodeOutput> => {
+  if (!user.verified) {
+    throw new AuthorizeError("User not verified");
+  }
+  let result: {status : number, output: string};
+
+  switch (parseInt(input.languageId)) {
+    case 1:
+      result = await RunCpp(input.code, input.input);
+      break;
+    case 2:
+      result = await RunJava(input.code, input.input);
+      break;
+    case 3:
+      result = await RunPython(input.code, input.input);
+      break;
+
+    default:
+      throw new APIError("Invalid language id");
+  }
+
+  return {
+    status: result.status,
+    output: result.output,
+    message: "Code executed successfully",
+  }
+};
+
 export const GetSubmissionById = async (
   id: number,
   repo: SubmissionRepositoryType
@@ -45,6 +82,28 @@ export const GetAllSubmissions = async (repo: SubmissionRepositoryType) => {
 
   if (submissions) {
     return submissions;
+  }
+
+  throw new APIError("Error fetching submissions");
+};
+
+export const GetSubmissionByProblemId = async (
+  id: number,
+  user: AuthPayload,
+  repo: SubmissionRepositoryType
+) => {
+  if (user.role === "admin") {
+    const submissions = await repo.getSubmissionByProblemIdAdmin(id);
+
+    if (submissions) {
+      return submissions;
+    }
+  } else if (user.role === "user") {
+    const submissions = await repo.getSubmissionByProblemIdUser(id, user.id);
+
+    if (submissions) {
+      return submissions;
+    }
   }
 
   throw new APIError("Error fetching submissions");
