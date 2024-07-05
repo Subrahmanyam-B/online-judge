@@ -3,7 +3,7 @@ import * as service from "../service/problems.service";
 import * as repository from "../repository/problems.repository";
 import { Authenticate } from "../middlewares";
 import { ValidateRequest } from "../utils";
-import { CreateProblemInput, CreateProblemSchema } from "../dto/problems.dto";
+import { CreateProblemInput, CreateProblemSchema, UpdateProblemInput, UpdateProblemSchema } from "../dto/problems.dto";
 
 const router = express.Router();
 const repo = repository.ProblemsRepository;
@@ -49,6 +49,40 @@ router.get(
     try {
       const id = parseInt(req.params.id);
       const response = await service.GetProblemById(id, repo);
+      return res.status(200).json(response);
+    } catch (error) {
+      return res.status(404).json({ error });
+    }
+  }
+);
+
+router.put(
+  "/problem/:id",
+  Authenticate,
+  async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    try {
+      const id = parseInt(req.params.id);
+      const error = ValidateRequest<UpdateProblemInput>(req.body, UpdateProblemSchema);
+
+      if (error) {
+        return res.status(404).json({ error });
+      }
+
+      const response = await service.UpdateProblem(id, req.body, req.user, repo);
+      return res.status(200).json(response);
+    } catch (error) {
+      return res.status(404).json({ error });
+    }
+  }
+);
+
+router.delete(
+  "/problem/:id",
+  Authenticate,
+  async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    try {
+      const id = parseInt(req.params.id);
+      const response = await service.DeleteProblem(id, req.user, repo);
       return res.status(200).json(response);
     } catch (error) {
       return res.status(404).json({ error });

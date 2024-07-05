@@ -3,51 +3,100 @@
 @tailwind utilities;
 
 @layer base {
-    :root {
-      --background: 280 34% 99%;
-      --foreground: 280 69% 2%;
-      --muted: 280 16% 88%;
-      --muted-foreground: 280 1% 32%;
-      --popover: 280 34% 99%;
-      --popover-foreground: 280 69% 2%;
-      --card: 280 34% 99%;
-      --card-foreground: 280 69% 2%;
-      --border: 280 13% 91%;
-      --input: 280 13% 91%;
-      --primary: 280 99% 58%;
-      --primary-foreground: 0 0% 100%;
-      --secondary: 280 18% 85%;
-      --secondary-foreground: 280 18% 25%;
-      --accent: 280 18% 85%;
-      --accent-foreground: 280 18% 25%;
-      --destructive: 8 94% 40%;
-      --destructive-foreground: 0 0% 100%;
-      --ring: 280 99% 58%;
-      --radius: 0.5rem;
-    }
-  
-    .dark {
-      --background: 280 38% 2%;
-      --foreground: 280 26% 99%;
-      --muted: 280 16% 12%;
-      --muted-foreground: 280 1% 68%;
-      --popover: 280 38% 2%;
-      --popover-foreground: 280 26% 99%;
-      --card: 280 38% 2%;
-      --card-foreground: 280 26% 99%;
-      --border: 280 13% 10%;
-      --input: 280 13% 10%;
-      --primary: 280 99% 58%;
-      --primary-foreground: 0 0% 100%;
-      --secondary: 280 17% 8%;
-      --secondary-foreground: 280 17% 68%;
-      --accent: 280 17% 8%;
-      --accent-foreground: 280 17% 68%;
-      --destructive: 8 94% 56%;
-      --destructive-foreground: 0 0% 100%;
-      --ring: 280 99% 58%;
-    }
+
+  /* Discord Theme */
+  :root {
+    --background: 334 62% 100%;
+    --foreground: 334 55% 1%;
+    --muted: 334 35% 95%;
+    --muted-foreground: 334 9% 37%;
+    --popover: 334 62% 100%;
+    --popover-foreground: 334 55% 1%;
+    --card: 334 62% 100%;
+    --card-foreground: 334 55% 1%;
+    --border: 334 5% 95%;
+    --input: 334 5% 95%;
+    --primary: 334 44% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 334 11% 90%;
+    --secondary-foreground: 334 11% 30%;
+    --accent: 334 20% 82%;
+    --accent-foreground: 334 20% 22%;
+    --destructive: 18 93% 23%;
+    --destructive-foreground: 18 93% 83%;
+    --ring: 334 44% 52%;
+    --radius: 0.5rem;
   }
+
+  .dark {
+    --background: 217.5 9.09% 17.25%;
+    --foreground: 334 34% 98%;
+    --muted: 210 9.09% 12.94%;
+    --muted-foreground: 334 0% 60.77%;
+    --popover: 210 9.09% 12.94%;
+    --popover-foreground: 334 34% 98%;
+    --card: 210 9.09% 12.94%;
+    --card-foreground: 334 34% 98%;
+    --border: 334 0% 18.46%;
+    --input: 214.29 5.04% 27.25%;
+    --primary: 226.73 58.43% 65.1%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214.29 5.04% 27.25%;
+    --secondary-foreground: 334 0% 100%;
+    --accent: 217.5 9.09% 17.25%;
+    --accent-foreground: 226.73 58.43% 65.1%;
+    --destructive: 0 86.89% 48.16%;
+    --destructive-foreground: 0 0% 0%;
+    --ring: 217.5 9.09% 17.25%;
+  }
+}
+
+/* @layer base { */
+/*   :root { */
+/*     --background: 280 34% 99%; */
+/*     --foreground: 280 69% 2%; */
+/*     --muted: 280 16% 88%; */
+/*     --muted-foreground: 280 1% 32%; */
+/*     --popover: 280 34% 99%; */
+/*     --popover-foreground: 280 69% 2%; */
+/*     --card: 280 34% 99%; */
+/*     --card-foreground: 280 69% 2%; */
+/*     --border: 280 13% 91%; */
+/*     --input: 280 13% 91%; */
+/*     --primary: 280 99% 58%; */
+/*     --primary-foreground: 0 0% 100%; */
+/*     --secondary: 280 18% 85%; */
+/*     --secondary-foreground: 280 18% 25%; */
+/*     --accent: 280 18% 85%; */
+/*     --accent-foreground: 280 18% 25%; */
+/*     --destructive: 8 94% 40%; */
+/*     --destructive-foreground: 0 0% 100%; */
+/*     --ring: 280 99% 58%; */
+/*     --radius: 0.5rem; */
+/*   } */
+/**/
+/*   .dark { */
+/*     --background: 280 38% 2%; */
+/*     --foreground: 280 26% 99%; */
+/*     --muted: 280 16% 12%; */
+/*     --muted-foreground: 280 1% 68%; */
+/*     --popover: 280 38% 2%; */
+/*     --popover-foreground: 280 26% 99%; */
+/*     --card: 280 38% 2%; */
+/*     --card-foreground: 280 26% 99%; */
+/*     --border: 280 13% 10%; */
+/*     --input: 280 13% 10%; */
+/*     --primary: 280 99% 58%; */
+/*     --primary-foreground: 0 0% 100%; */
+/*     --secondary: 280 17% 8%; */
+/*     --secondary-foreground: 280 17% 68%; */
+/*     --accent: 280 17% 8%; */
+/*     --accent-foreground: 280 17% 68%; */
+/*     --destructive: 8 94% 56%; */
+/*     --destructive-foreground: 0 0% 100%; */
+/*     --ring: 280 99% 58%; */
+/*   } */
+/* } */
 
 @layer base {
   * {

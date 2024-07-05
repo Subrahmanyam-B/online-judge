@@ -4,7 +4,7 @@ export const content = [
   "./pages/**/*.{ts,tsx}",
   "./components/**/*.{ts,tsx}",
   "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
+  "./src/**/*.{ts,tsx}",
 ];
 export const prefix = "";
 export const theme = {
@@ -69,14 +69,35 @@ export const theme = {
         "0%,70%,100%": { opacity: "1" },
         "20%,50%": { opacity: "0" },
       },
+      "border-beam": {
+        "100%": {
+          "offset-distance": "100%",
+        },
+      },
+      "meteor": {
+        "0%": { transform: "rotate(215deg) translateX(0)", opacity: 1 },
+        "70%": { opacity: 1 },
+        "100%": {
+          transform: "rotate(215deg) translateX(-1000px)",
+          opacity: 0,
+        },
+      },
+      "shine": {
+        from: { backgroundPosition: '200% 0' },
+        to: { backgroundPosition: '-200% 0' },
+      },
     },
     animation: {
       "accordion-down": "accordion-down 0.2s ease-out",
       "accordion-up": "accordion-up 0.2s ease-out",
       "caret-blink": "caret-blink 1.25s ease-out infinite",
+      "border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
+      "meteor": "meteor 5s linear infinite",
+      "shine": "shine 8s ease-in-out infinite",
     },
   },
 };
 import tailwindcssAnimate from "tailwindcss-animate";
+import tailwindcssTypography from "@tailwindcss/typography";
 
-export const plugins = [tailwindcssAnimate];
+export const plugins = [tailwindcssAnimate, tailwindcssTypography];

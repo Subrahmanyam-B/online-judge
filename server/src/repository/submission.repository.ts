@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { DB } from "../db/db.connection";
 import { Submission, SubmissionStatus, submission } from "../db/schema/submissions";
 import { CreateSubmissionInput, UpdateSubmissionInput } from "../dto/submission.dto";
+import { problem } from "../db/schema";
 
 export type SubmissionRepositoryType = {
   createSubmission: (input: CreateSubmissionInput) => Promise<Submission>;
@@ -43,7 +44,13 @@ const getAllSubmission = async (): Promise<Submission[]> => {
 };
 
 const getSubmissionByUserId = async (userId: number): Promise<Submission[]> => {
-  const result = await DB.select().from(submission).where(eq(submission.userId, userId));
+  // const result = await DB.select().from(submission).where(eq(submission.userId, userId));
+  const result = await DB.query.submission.findMany({
+    with: {
+      problem: true,
+    },
+    where: eq(submission.userId, userId),
+  })
 
   return result;
 };

@@ -35,14 +35,14 @@ type GetProblem = {
 };
 
 type CreateProblemInput = {
-  title: string;
-  difficulty: string;
-  desc: string;
-  input: string;
-  output: string;
-  constraints: string;
-  timeLimit: number;
-  testcases: {
+  title?: string;
+  difficulty?: string;
+  desc?: string;
+  input?: string;
+  output?: string;
+  constraints?: string;
+  timeLimit?: number;
+  testcases?: {
     input: string;
     expectedOutput: string;
     isSample: boolean;
@@ -52,6 +52,14 @@ type CreateProblemInput = {
 
 export const createProblem = async (values: CreateProblemInput) => {
   return await api.post("/problem", values).then((response) => response.data);
+};
+
+export const updateProblem = async (id:string, values: CreateProblemInput) => {
+  return await api.put("/problem/" + id, values).then((response) => response.data);
+};
+
+export const deleteProblem = async (id: string) => {
+  return await api.delete("/problem/" + id).then((response) => response.data);
 };
 
 type RunCodeInput = {

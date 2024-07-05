@@ -83,6 +83,7 @@ const FormSchema = z.object({
 
 const TextEditor = ({ language, problemId }: TextEditorProps) => {
   const [code, setCode] = useRecoilState(codeAtom);
+  // const [languageSelect, setlanguageSelect] = useState<string>("1");
   const [output, setOutput] = useState<string>("Output");
   const [isOutputLoading, setIsOutputLoading] = useState<boolean>(false);
   const [isSubmissionLoading, setIsSubmissionLoading] =
@@ -90,9 +91,21 @@ const TextEditor = ({ language, problemId }: TextEditorProps) => {
   const [submissionResponse, setSubmissionResponse] =
     useState<SubmissionResponse>();
 
-  useEffect(() => {
-    console.log(submissionResponse);
-  }, [submissionResponse]);
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      languageId: "1",
+      code: code,
+    },
+  });
+
+  const { data: submissions, isLoading } = useQuery({
+    queryKey: ["submissions"],
+    queryFn: () => getProblemSubmissions(problemId),
+  });
+  console.log(submissions);
+
+
 
   const setBoilerPlateCode = (value: string) => {
     if (value === "1") {
@@ -145,13 +158,15 @@ int main() {
     }
   };
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      languageId: "1",
-      code: code,
-    },
-  });
+  if (!isLoading) {
+    if (submissions[submissions?.length - 1]?.code) {
+      setCode(submissions[submissions?.length - 1].code);
+      // setCode(submissions[submissions?.length - 1].languageId);
+    } else {
+      setBoilerPlateCode("1");
+    }
+  }
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setBoilerPlateCode("cpp"), []);
 
@@ -217,7 +232,7 @@ int main() {
                       field.onChange(value);
                       setBoilerPlateCode(value);
                     }}
-                    defaultValue={String(field.value)}
+                    defaultValue={form.getValues("languageId")}
                   >
                     <FormControl>
                       <SelectTrigger className="">
@@ -452,16 +467,15 @@ const ProblemDetails = ({ problemId }: { problemId: string }) => {
 };
 
 const ProblemPage = () => {
-
   const router = useRouter();
 
   const auth = useRecoilValue(authAtom);
 
   useEffect(() => {
     if (!auth.isAuthenticated) {
-      router.history.push('/sign-in');
+      router.history.push("/sign-in");
     }
-  }, [auth, router])
+  }, [auth, router]);
 
   const params = useParams({ from: "/problem/$problemId" });
   return (
