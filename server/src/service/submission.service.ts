@@ -21,7 +21,7 @@ export const CreateSubmission = async (
   input: CreateSubmissionInput,
   user: AuthPayload,
   repo: SubmissionRepositoryType,
-  problemRepo: ProblemsRepositoryType
+  problemRepo: ProblemsRepositoryType,
 ) => {
   if (!user.verified) {
     throw new AuthorizeError("User is not verified");
@@ -54,21 +54,21 @@ export const CreateSubmission = async (
         res = await executionCpp(
           input.code,
           problem.testcases,
-          problem.problem.timeLimit
+          problem.problem.timeLimit,
         );
         break;
       case 2:
         res = await executionJava(
           input.code,
           problem.testcases,
-          problem.problem.timeLimit
+          problem.problem.timeLimit,
         );
         break;
       case 3:
         res = await executionPython(
           input.code,
           problem.testcases,
-          problem.problem.timeLimit
+          problem.problem.timeLimit,
         );
         break;
 
@@ -94,7 +94,7 @@ export const CreateSubmission = async (
 
 export const RunCode = async (
   input: RunCodeInput,
-  user: AuthPayload
+  user: AuthPayload,
 ): Promise<RunCodeOutput> => {
   if (!user.verified) {
     throw new AuthorizeError("User not verified");
@@ -125,7 +125,7 @@ export const RunCode = async (
 
 export const GetSubmissionById = async (
   id: number,
-  repo: SubmissionRepositoryType
+  repo: SubmissionRepositoryType,
 ) => {
   const submission = await repo.findSubmission(id);
 
@@ -149,16 +149,14 @@ export const GetAllSubmissions = async (repo: SubmissionRepositoryType) => {
 export const GetSubmissionByProblemId = async (
   id: number,
   user: AuthPayload,
-  repo: SubmissionRepositoryType
+  repo: SubmissionRepositoryType,
 ) => {
   if (user.role === "admin") {
-
     const submissions = await repo.getSubmissionByProblemIdAdmin(id);
 
     if (submissions) {
       return submissions;
     }
-
   } else {
     const submissions = await repo.getSubmissionByProblemIdUser(id, user.id);
 
@@ -172,7 +170,7 @@ export const GetSubmissionByProblemId = async (
 
 export const GetSubmissionsByUserId = async (
   userId: number,
-  repo: SubmissionRepositoryType
+  repo: SubmissionRepositoryType,
 ) => {
   const submissions = await repo.getSubmissionByUserId(userId);
 
@@ -183,9 +181,22 @@ export const GetSubmissionsByUserId = async (
   throw new APIError("Error fetching submissions");
 };
 
+export const GetSubmissionHistory = async (
+  userId: number,
+  repo: SubmissionRepositoryType,
+) => {
+  const submissionHistory = await repo.getSubmissionHistory(userId);
+
+  if (submissionHistory) {
+    return submissionHistory;
+  }
+
+  throw new APIError("Error fetching submission history");
+};
+
 export const DeleteSubmission = async (
   id: number,
-  repo: SubmissionRepositoryType
+  repo: SubmissionRepositoryType,
 ) => {
   const result = await repo.deleteSubmission(id);
 
@@ -198,7 +209,7 @@ export const DeleteSubmission = async (
 
 export const UpdateSubmission = async (
   input: UpdateSubmissionInput,
-  repo: SubmissionRepositoryType
+  repo: SubmissionRepositoryType,
 ) => {
   const updatedSubmission = await repo.updateSubmission(input);
 
