@@ -18,23 +18,30 @@ declare global {
   }
 }
 
-export const Authenticate = async (req: Request, res: Response, next: NextFunction) => {
+export const Authenticate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const validate = await ValidateSignature(req);
 
   if (validate) {
-    next()
+    next();
   } else {
-    return res.status(401).json({ "message": "User not Authorized" });
+    return res.status(401).json({ message: "User not Authorized" });
   }
-}
+};
 
-
-export const AuthenticateRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
+export const AuthenticateRefreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const validate = await ValidateRefreshToken(req);
 
   if (validate) {
-    next()
+    next();
   } else {
-    return res.status(401).json({ "message": "User not Authorized" });
+    return res.status(401).json({ message: "User not Authorized" });
   }
-}
+};

@@ -7,6 +7,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/components/ui/use-toast";
 import { AuthPayload, ValidateSignature } from "@/lib/auth";
 import { authAtom } from "@/state/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,9 +29,9 @@ const SignInForm = () => {
 
   useEffect(() => {
     if (auth.isAuthenticated) {
-      router.history.push('/dashboard');
+      router.history.push("/dashboard");
     }
-  }, [auth, router])
+  }, [auth, router]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,23 +43,26 @@ const SignInForm = () => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    try {
-      login(values.email, values.password)
-        .then((response) => {
-          if (response.accessToken) {
-            return ValidateSignature();
-          }
-          throw new Error("Login failed");
-        })
-        .then((payload: AuthPayload | false) => {
-          if (payload) {
-            setAuth({ isAuthenticated: true, user: payload })
-            router.history.push("/dashboard");
-          }
+    login(values.email, values.password)
+      .then((response) => {
+        if (response.accessToken) {
+          return ValidateSignature();
+        }
+        throw new Error("Login failed");
+      })
+      .then((payload: AuthPayload | false) => {
+        if (payload) {
+          setAuth({ isAuthenticated: true, user: payload });
+          router.history.push("/dashboard");
+        }
+      })
+      .catch((err) => {
+        toast({
+          title: "Login Failed",
+          description: "Error with logging in. Please try again.",
+          variant: "destructive",
         });
-    } catch (error) {
-      console.log(error);
-    }
+      });
     console.log(values);
   }
 
@@ -148,7 +152,6 @@ const SignIn = () => {
 //       to: "/dashboard",
 //     })
 //   }
-
 
 //   return (
 //     <>

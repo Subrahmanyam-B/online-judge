@@ -85,7 +85,7 @@ const UpdateProblemForm = ({
   });
 
   async function onSubmit(values: z.infer<typeof updateProblemInputSchema>) {
-    await updateProblem(String(problem.id),values).then((response) => {
+    await updateProblem(String(problem.id), values).then((response) => {
       console.log(response);
       if (response) {
         toast({
@@ -101,7 +101,13 @@ const UpdateProblemForm = ({
     <Card className="max-w-[50rem] w-full">
       <CardHeader className="text-xl font-semibold flex flex-row justify-between">
         <div>Update Problem</div>
-        <Button onClick={() => setIsFormOpen(false)} className="px-3" variant="outline"><X className="w-4 h-4"/></Button>
+        <Button
+          onClick={() => setIsFormOpen(false)}
+          className="px-3"
+          variant="outline"
+        >
+          <X className="w-4 h-4" />
+        </Button>
       </CardHeader>
       <CardContent className="p-4">
         <AutoForm
@@ -240,8 +246,8 @@ const CreateProblemCard = () => {
   const testCaseSchema = z.object({
     input: z.string(),
     expectedOutput: z.string(),
-    isSample: z.boolean(),
-    explanation: z.string(),
+    isSample: z.boolean().optional(),
+    explanation: z.string().optional(),
   });
 
   // Define the schema for the CreateProblemInput

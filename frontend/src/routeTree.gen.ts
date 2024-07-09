@@ -17,7 +17,6 @@ import { Route as SignUpRouteImport } from './routes/sign-up/route'
 import { Route as SignInRouteImport } from './routes/sign-in/route'
 import { Route as ProfileRouteImport } from './routes/profile/route'
 import { Route as ProblemsRouteImport } from './routes/problems/route'
-import { Route as LeaderboardRouteImport } from './routes/leaderboard/route'
 import { Route as DashboardRouteImport } from './routes/dashboard/route'
 import { Route as AdminRouteImport } from './routes/admin/route'
 import { Route as IndexImport } from './routes/index'
@@ -52,11 +51,6 @@ const ProfileRouteRoute = ProfileRouteImport.update({
 
 const ProblemsRouteRoute = ProblemsRouteImport.update({
   path: '/problems',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const LeaderboardRouteRoute = LeaderboardRouteImport.update({
-  path: '/leaderboard',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -103,13 +97,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRoute
-    }
-    '/leaderboard': {
-      id: '/leaderboard'
-      path: '/leaderboard'
-      fullPath: '/leaderboard'
-      preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRoute
     }
     '/problems': {
@@ -170,7 +157,6 @@ export const routeTree = rootRoute.addChildren({
   IndexRoute,
   AdminRouteRoute,
   DashboardRouteRoute,
-  LeaderboardRouteRoute,
   ProblemsRouteRoute,
   ProfileRouteRoute,
   SignInRouteRoute,
@@ -191,7 +177,6 @@ export const routeTree = rootRoute.addChildren({
         "/",
         "/admin",
         "/dashboard",
-        "/leaderboard",
         "/problems",
         "/profile",
         "/sign-in",
@@ -209,9 +194,6 @@ export const routeTree = rootRoute.addChildren({
     },
     "/dashboard": {
       "filePath": "dashboard/route.tsx"
-    },
-    "/leaderboard": {
-      "filePath": "leaderboard/route.tsx"
     },
     "/problems": {
       "filePath": "problems/route.tsx"

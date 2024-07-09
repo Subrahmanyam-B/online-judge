@@ -22,7 +22,7 @@ export const register = async (
   lastName: string,
   displayName: string,
   email: string,
-  password: string
+  password: string,
 ) => {
   return await api
     .post("/signup", {
@@ -42,13 +42,11 @@ export const register = async (
     });
 };
 
-export const verify = async (
-  verificationCode: string,
-) => {
+export const verify = async (verificationCode: string) => {
   return await api
     .post("/verify", {
-    verificationCode
-    }) 
+      verificationCode,
+    })
     .then((response) => {
       if (response.data.accessToken) {
         updateAccessToken(response.data.accessToken);
@@ -63,6 +61,16 @@ export const getProfile = async () => {
   return await api.get("/user").then((response) => response.data);
 };
 
+export const getSolvedProblems = async () => {
+  return await api
+    .get("/user/problems-solved")
+    .then((response) => response.data);
+};
+
+export const getLeaderboard = async () => {
+  return await api.get("/leaderboard").then((response) => response.data);
+};
+
 type UpdateProfileData = {
   firstName: string;
   lastName: string;
@@ -70,15 +78,13 @@ type UpdateProfileData = {
   email: string;
 };
 
-export const updateProfile = async (
-values  : UpdateProfileData
-) => {
+export const updateProfile = async (values: UpdateProfileData) => {
   return await api
     .patch("/user", {
-      firstName : values.firstName,
-      lastName : values.lastName,
-      displayName : values.displayName,
-      email : values.email,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      displayName: values.displayName,
+      email: values.email,
     })
     .then((response) => response.data);
 };

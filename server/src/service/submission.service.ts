@@ -16,12 +16,15 @@ import {
   executionPython,
 } from "../utils/code/ExecuteCode";
 import { ProblemsRepositoryType } from "../repository/problems.repository";
+import { UserRepositoryType } from "../repository/user.repository";
+import { UpdateUserSolvedProblems } from "./user.service";
 
 export const CreateSubmission = async (
   input: CreateSubmissionInput,
   user: AuthPayload,
   repo: SubmissionRepositoryType,
   problemRepo: ProblemsRepositoryType,
+  userRepo: UserRepositoryType,
 ) => {
   if (!user.verified) {
     throw new AuthorizeError("User is not verified");
@@ -31,11 +34,6 @@ export const CreateSubmission = async (
 
   const newSubmission = await repo.createSubmission(input);
   const problem = await problemRepo.findProblem(input.problemId);
-  let result: {
-    status: string;
-    runtime: number;
-    testCaseId: number;
-  }[];
 
   let res: {
     result: {
@@ -48,27 +46,26 @@ export const CreateSubmission = async (
   } = { result: [], totalRuntime: 0, overallStatus: "Pending" };
 
   if (newSubmission) {
-    // TODO: Add code to execute the submission and update the status
     switch (parseInt(input.languageId)) {
       case 1:
         res = await executionCpp(
           input.code,
           problem.testcases,
-          problem.problem.timeLimit,
+          problem.problem.timeLimit || undefined,
         );
         break;
       case 2:
         res = await executionJava(
           input.code,
           problem.testcases,
-          problem.problem.timeLimit,
+          problem.problem.timeLimit || undefined,
         );
         break;
       case 3:
         res = await executionPython(
           input.code,
           problem.testcases,
-          problem.problem.timeLimit,
+          problem.problem.timeLimit || undefined,
         );
         break;
 
@@ -76,6 +73,14 @@ export const CreateSubmission = async (
         throw new APIError("Invalid language id");
     }
     console.log(res);
+    if (res.overallStatus === "Accepted") {
+      UpdateUserSolvedProblems(
+        problem.problem.id,
+        problem.problem.difficulty,
+        user,
+        userRepo,
+      );
+    }
     // newSubmission.status = res.overallStatus;
     // newSubmission.runtime = res.totalRuntime;
     // newSubmission.testcaseResults = res.result;
@@ -103,13 +108,13 @@ export const RunCode = async (
 
   switch (parseInt(input.languageId)) {
     case 1:
-      result = await RunCpp(input.code, input.input);
+      result = await RunCpp(input.code, input.input || "");
       break;
     case 2:
-      result = await RunJava(input.code, input.input);
+      result = await RunJava(input.code, input.input || "");
       break;
     case 3:
-      result = await RunPython(input.code, input.input);
+      result = await RunPython(input.code, input.input || "");
       break;
 
     default:

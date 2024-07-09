@@ -7,7 +7,6 @@ import {
   Moon,
   Settings,
   Sun,
-  Trophy,
   User,
 } from "lucide-react";
 import Logo from "../assets/Logo.svg";
@@ -47,7 +46,7 @@ export default function Sidebar() {
     setAuth({ isAuthenticated: false, user: null });
   }
 
-  const {theme , setTheme} = useTheme();
+  const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -71,11 +70,6 @@ export default function Sidebar() {
           link: "/submissions",
           icon: <ListChecks />,
           text: "Submissions",
-        },
-        {
-          link: "/leaderboard",
-          icon: <Trophy />,
-          text: "Leaderboard",
         },
       ],
     },
@@ -156,7 +150,11 @@ export default function Sidebar() {
           <LogOutIcon className="h-4 w-4" />
         </Button>
         <Button variant="outline" onClick={toggleTheme}>
-          {theme === 'light' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {theme === "light" ? (
+            <Sun className="h-4 w-4" />
+          ) : (
+            <Moon className="h-4 w-4" />
+          )}
         </Button>
       </div>
     </div>

@@ -1,10 +1,12 @@
-{"ts-node": {
-  "files": true
-},
+{
+  "ts-node": {
+    "files": true
+  },
   "compilerOptions": {
+    "skipLibCheck": true,
     "target": "ES6",
     "module": "CommonJS",
-    "lib": ["DOM", "ES6" , "ESNext.AsyncIterable"],
+    "lib": ["DOM", "ES6", "ESNext.AsyncIterable"],
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
@@ -13,6 +15,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
-    "typeRoots" : ["./node_modules/@types", "./types"]
-  }
+    "typeRoots": ["./node_modules/@types", "./types"]
+  },
+  "exclude": ["test_codes", "node_modules/**"]
 }

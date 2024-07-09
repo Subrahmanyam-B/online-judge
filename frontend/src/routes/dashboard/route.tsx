@@ -5,13 +5,15 @@ import { Card } from "@/components/ui/card";
 
 import { Calendar } from "@/components/ui/calendar";
 import { useQuery } from "@tanstack/react-query";
-import { getProfile } from "@/api/auth";
+import { getLeaderboard, getProfile, getSolvedProblems } from "@/api/auth";
 import { useRecoilValue } from "recoil";
 import { authAtom } from "@/state/auth";
 import { SubmissionHistory } from "@/components/ui/dashboard/submission-history";
 import { ProblemProgress } from "@/components/ui/dashboard/problem-progress";
 import { ProblemsHome } from "@/components/ui/dashboard/problems-home";
 import { LeaderboardHome } from "@/components/ui/dashboard/leaderboard-home";
+import { getSubmissionHistory } from "@/api/submissions";
+import { getProblems } from "@/api/problems";
 
 export function CalendarDemo() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -44,9 +46,36 @@ const Dashboard = () => {
     queryFn: getProfile,
   });
 
+  const { data: chatData, isLoading: isSubmissionHistoryLoading } = useQuery({
+    queryKey: ["submission-history"],
+    queryFn: getSubmissionHistory,
+  });
+
+  const { data: allProblems, isLoading: areProblemsLoading } = useQuery({
+    queryKey: ["get-problems"],
+    queryFn: getProblems,
+  });
+
+  const { data: problemsSolved, isLoading: areSolvedProblemsLoading } =
+    useQuery({
+      queryKey: ["problems-solved"],
+      queryFn: getSolvedProblems,
+    });
+
+  const { data: leaderBoard, isLoading: isLeaderboardLoading } = useQuery({
+    queryKey: ["leaderboard"],
+    queryFn: getLeaderboard,
+  });
+
   console.log(data);
 
-  if (isLoading) {
+  if (
+    isLoading &&
+    isSubmissionHistoryLoading &&
+    areSolvedProblemsLoading &&
+    areProblemsLoading &&
+    isLeaderboardLoading
+  ) {
     return <div>Loading...</div>;
   }
 
@@ -54,14 +83,17 @@ const Dashboard = () => {
     <div className="p-10">
       <h1 className="text-4xl font-bold">Dashboard</h1>
       <div className="flex justify-end py-10 gap-10 w-full">
-        <SubmissionHistory />
-        <ProblemProgress />
+        <SubmissionHistory chartData={chatData} />
+        <ProblemProgress
+          totalCount={allProblems?.length}
+          solvedCount={problemsSolved?.length}
+        />
 
         <CalendarDemo />
       </div>
       <div className="flex w-full gap-10">
-        <ProblemsHome />
-        <LeaderboardHome />
+        <ProblemsHome problems={allProblems} />
+        <LeaderboardHome leaderboard={leaderBoard} />
       </div>
     </div>
   );

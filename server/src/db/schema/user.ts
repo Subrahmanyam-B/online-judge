@@ -3,6 +3,7 @@ import {
   boolean,
   pgTable,
   real,
+  integer,
   serial,
   text,
   timestamp,
@@ -32,14 +33,17 @@ export const user = pgTable(
       .array()
       .default(sql`ARRAY[]::text[]`),
     totalPoints: real("totalPoints").default(0),
+    problemsSolved: integer("problemsSolved")
+      .array()
+      .default(sql`ARRAY[]::integer[]`),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (table) => ({
     emailUniqueIndex: uniqueIndex("emailUniqueIndex").on(table.email),
     displayNameUniqueIndex: uniqueIndex("displayNameUniqueIndex").on(
-      table.displayName
+      table.displayName,
     ),
-  })
+  }),
 );
 
 export type User = InferSelectModel<typeof user>;

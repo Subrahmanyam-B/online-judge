@@ -45,8 +45,8 @@ type CreateProblemInput = {
   testcases?: {
     input: string;
     expectedOutput: string;
-    isSample: boolean;
-    explanation: string;
+    isSample?: boolean;
+    explanation?: string;
   }[];
 };
 
@@ -54,8 +54,10 @@ export const createProblem = async (values: CreateProblemInput) => {
   return await api.post("/problem", values).then((response) => response.data);
 };
 
-export const updateProblem = async (id:string, values: CreateProblemInput) => {
-  return await api.put("/problem/" + id, values).then((response) => response.data);
+export const updateProblem = async (id: string, values: CreateProblemInput) => {
+  return await api
+    .put("/problem/" + id, values)
+    .then((response) => response.data);
 };
 
 export const deleteProblem = async (id: string) => {
@@ -83,10 +85,9 @@ type SubmitCodeInput = {
   code: string;
 };
 
-export const submitCode = async (values : SubmitCodeInput) => {
+export const submitCode = async (values: SubmitCodeInput) => {
   return await api.post("/submit", values).then((response) => response.data);
 };
-
 
 export const getProblemSubmissions = async (id: string) => {
   return await api.get("/submissions/" + id).then((response) => response.data);

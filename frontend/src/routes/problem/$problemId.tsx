@@ -103,9 +103,6 @@ const TextEditor = ({ language, problemId }: TextEditorProps) => {
     queryKey: ["submissions"],
     queryFn: () => getProblemSubmissions(problemId),
   });
-  console.log(submissions);
-
-
 
   const setBoilerPlateCode = (value: string) => {
     if (value === "1") {
@@ -132,7 +129,7 @@ int main() {
   return 0;
 
 }
-`
+`,
       );
     } else if (value === "3") {
       setCode(`print('Hello World')`);
@@ -153,7 +150,7 @@ int main() {
     System.out.println("Hello World");
 
   }
-}`
+}`,
       );
     }
   };
@@ -161,9 +158,6 @@ int main() {
   if (!isLoading) {
     if (submissions[submissions?.length - 1]?.code) {
       setCode(submissions[submissions?.length - 1].code);
-      // setCode(submissions[submissions?.length - 1].languageId);
-    } else {
-      setBoilerPlateCode("1");
     }
   }
 
@@ -230,7 +224,7 @@ int main() {
                   <Select
                     onValueChange={(value) => {
                       field.onChange(value);
-                      setBoilerPlateCode(value);
+                      // setBoilerPlateCode(value);
                     }}
                     defaultValue={form.getValues("languageId")}
                   >
@@ -381,7 +375,7 @@ const SubmissionsTableProblemPage = ({ problemId }: { problemId: string }) => {
         {submissions.map(
           (
             submission: { status: string; createdAt: string; runtime: number },
-            index: number
+            index: number,
           ) => (
             <TableRow key={index}>
               <TableCell>
@@ -390,7 +384,7 @@ const SubmissionsTableProblemPage = ({ problemId }: { problemId: string }) => {
               <TableCell>{submission.createdAt}</TableCell>
               <TableCell>{submission.runtime}</TableCell>
             </TableRow>
-          )
+          ),
         )}
       </TableBody>
     </Table>

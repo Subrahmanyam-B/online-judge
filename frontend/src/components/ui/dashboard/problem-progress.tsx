@@ -8,21 +8,21 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
-const chartData = [
-  { browser: "safari", visitors: 200, fill: "hsl(var(--primary))" },
-];
 
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--primary))",
+  solved: {
+    label: "Solved",
   },
 } satisfies ChartConfig;
 
-export function ProblemProgress() {
+export function ProblemProgress({
+  totalCount,
+  solvedCount,
+}: {
+  totalCount: number;
+  solvedCount: number;
+}) {
+  const chartData = [{ solved: solvedCount, fill: "hsl(var(--primary)" }];
   return (
     <Card className="flex w-2/5 flex-col">
       <CardHeader className="items-center pb-0">
@@ -36,7 +36,7 @@ export function ProblemProgress() {
           <RadialBarChart
             data={chartData}
             startAngle={0}
-            endAngle={250}
+            endAngle={(solvedCount / totalCount) * 360}
             innerRadius={100}
             outerRadius={170}
           >
@@ -47,7 +47,7 @@ export function ProblemProgress() {
               className="first:fill-muted last:fill-background"
               polarRadius={[86, 74]}
             />
-            <RadialBar dataKey="visitors" background cornerRadius={10} />
+            <RadialBar dataKey="solved" background cornerRadius={10} />
             <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
                 content={({ viewBox }) => {
@@ -64,14 +64,14 @@ export function ProblemProgress() {
                           y={viewBox.cy}
                           className="fill-foreground text-4xl font-bold"
                         >
-                          {chartData[0].visitors.toLocaleString()}
+                          {chartData[0].solved?.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          Solved
                         </tspan>
                       </text>
                     );

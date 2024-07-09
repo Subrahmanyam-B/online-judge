@@ -1,5 +1,5 @@
 {
-  "id": "81de1aab-4910-4a93-aabd-7c22032959a2",
+  "id": "46d1cd18-ba20-485d-92cb-2a96e16bf32c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -91,6 +91,13 @@
           "primaryKey": false,
           "notNull": false,
           "default": 0
+        },
+        "problemsSolved": {
+          "name": "problemsSolved",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "ARRAY[]::integer[]"
         },
         "created_at": {
           "name": "created_at",
@@ -227,6 +234,12 @@
           "primaryKey": false,
           "notNull": false,
           "default": false
+        },
+        "explanation": {
+          "name": "explanation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -247,9 +260,120 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
+    },
+    "submission": {
+      "name": "submission",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "problemId": {
+          "name": "problemId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "languageId": {
+          "name": "languageId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "submission_status",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "runtime": {
+          "name": "runtime",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "memoryUsage": {
+          "name": "memoryUsage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "testcaseResults": {
+          "name": "testcaseResults",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "submission_userId_user_id_fk": {
+          "name": "submission_userId_user_id_fk",
+          "tableFrom": "submission",
+          "tableTo": "user",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "submission_problemId_problem_id_fk": {
+          "name": "submission_problemId_problem_id_fk",
+          "tableFrom": "submission",
+          "tableTo": "problem",
+          "columnsFrom": [
+            "problemId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     }
   },
-  "enums": {},
+  "enums": {
+    "submission_status": {
+      "name": "submission_status",
+      "values": {
+        "Pending": "Pending",
+        "Accepted": "Accepted",
+        "Failed": "Failed",
+        "TimeLimitExceeded": "TimeLimitExceeded",
+        "MemoryLimitExceeded": "MemoryLimitExceeded",
+        "RuntimeError": "RuntimeError",
+        "CompilationError": "CompilationError"
+      }
+    }
+  },
   "schemas": {},
   "_meta": {
     "columns": {},

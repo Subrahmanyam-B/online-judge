@@ -2,8 +2,9 @@ import express, { NextFunction, Request, Response } from "express";
 import * as service from "../service/submission.service";
 import * as repository from "../repository/submission.repository";
 import * as problemRepository from "../repository/problems.repository";
+import * as userRepository from "../repository/user.repository";
 import { Authenticate } from "../middlewares";
-import { ValidateRequest } from "../utils";
+import { APIError, ValidateRequest } from "../utils";
 import {
   CreateSubmissionInput,
   CreateSubmissionSchema,
@@ -14,6 +15,7 @@ import {
 const router = express.Router();
 const repo = repository.SubmissionRepository;
 const problemRepo = problemRepository.ProblemsRepository;
+const userRepo = userRepository.UserRepository;
 
 router.post(
   "/submit",
@@ -28,12 +30,16 @@ router.post(
       if (error) {
         return res.status(404).json({ error });
       }
+      if (!req.user) {
+        throw new APIError("Not Authorized");
+      }
 
       const response = await service.CreateSubmission(
         req.body,
         req.user,
         repo,
         problemRepo,
+        userRepo,
       );
       return res.status(200).json(response);
     } catch (error) {
@@ -119,4 +125,3 @@ router.get(
 );
 
 export default router;
-

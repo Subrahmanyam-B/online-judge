@@ -21,7 +21,7 @@ import { User } from "../db/schema";
 
 export const CreateUser = async (
   input: SignupInput,
-  repo: UserRepositoryType
+  repo: UserRepositoryType,
 ) => {
   const { firstName, lastName, displayName, email, password } = input;
   const salt = await GenerateSalt();
@@ -47,13 +47,13 @@ export const CreateUser = async (
     const accessToken = GenerateAccessSignature({
       id: newUser.id,
       email: newUser.email,
-      verified: newUser.verified,
+      verified: newUser.verified || false,
       role: newUser.role,
     });
     const refreshToken = GenerateRefreshSignature({
       id: newUser.id,
       email: newUser.email,
-      verified: newUser.verified,
+      verified: newUser.verified || false,
       role: newUser.role,
     });
 
@@ -72,7 +72,7 @@ export const CreateUser = async (
 
 export const UserLogin = async (
   input: LoginInput,
-  repo: UserRepositoryType
+  repo: UserRepositoryType,
 ) => {
   const { email, password } = input;
   const existingCustomer = await repo.findUser(email);
@@ -81,7 +81,7 @@ export const UserLogin = async (
   const validation = await ValidatePassword(
     password,
     existingCustomer.password,
-    existingCustomer.salt
+    existingCustomer.salt,
   );
 
   console.log(validation);
@@ -90,13 +90,13 @@ export const UserLogin = async (
     const accessToken = GenerateAccessSignature({
       id: existingCustomer.id,
       email: existingCustomer.email,
-      verified: existingCustomer.verified,
+      verified: existingCustomer.verified || false,
       role: existingCustomer.role,
     });
     const refreshToken = GenerateRefreshSignature({
       id: existingCustomer.id,
       email: existingCustomer.email,
-      verified: existingCustomer.verified,
+      verified: existingCustomer.verified || false,
       role: existingCustomer.role,
     });
     //send the result to the client
@@ -111,7 +111,7 @@ export const UserLogin = async (
 export const VerifyUser = async (
   user: AuthPayload,
   input: VerificationInput,
-  repo: UserRepositoryType
+  repo: UserRepositoryType,
 ) => {
   const { verificationCode } = input;
   const existingCustomer = await repo.findUser(user.email);
@@ -126,10 +126,7 @@ export const VerifyUser = async (
   }
 };
 
-export const GetNewAccessToken = async (
-  user: AuthPayload,
-  repo: UserRepositoryType
-) => {
+export const GetNewAccessToken = async (user: AuthPayload) => {
   const accessToken = GenerateAccessSignature({
     id: user.id,
     email: user.email,
@@ -146,18 +143,53 @@ export const GetNewAccessToken = async (
 
 export const GetProfile = async (
   user: AuthPayload,
-  repo: UserRepositoryType
+  repo: UserRepositoryType,
 ) => {
   const data = await repo.getProfile(user.email);
   return data;
 };
 
-export const UpdateProfile = async (input: any, user : AuthPayload,  repo: UserRepositoryType) => {
+export const GetUserProblemsSolved = async (
+  user: AuthPayload,
+  repo: UserRepositoryType,
+) => {
+  const data = await repo.getSolvedProblems(user.id);
+  return data;
+};
+
+export const GetLeaderboard = async (repo: UserRepositoryType) => {
+  const data = await repo.getLeaderboard();
+  return data;
+};
+
+export const UpdateProfile = async (
+  input: any,
+  user: AuthPayload,
+  repo: UserRepositoryType,
+) => {
   const data = await repo.updateUser(input, user.id);
   return data;
 };
 
 export const DeleteUser = async (input: any, repo: UserRepositoryType) => {
   const data = await repo.deleteUser(input);
+  return data;
+};
+
+export const UpdateUserSolvedProblems = async (
+  problemId: number,
+  problemDifficulty: string,
+  user: AuthPayload,
+  repo: UserRepositoryType,
+) => {
+  let points =
+    problemDifficulty === "easy"
+      ? 10
+      : problemDifficulty === "medium"
+        ? 20
+        : problemDifficulty === "hard"
+          ? 30
+          : 0;
+  const data = await repo.updateUserSolvedProblems(problemId, user.id, points);
   return data;
 };
