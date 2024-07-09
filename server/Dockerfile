@@ -8,6 +8,13 @@ RUN npm install
 
 COPY . .
 
+RUN apk add --no-cache \
+    g++ \
+    openjdk17-jdk \
+    python3 \
+    py3-pip
+
+
 RUN npm run build
 
 EXPOSE 9000
