@@ -1,3 +1,4 @@
+// import { BASE_API_URL } from "@/config";
 import {
   getAccessToken,
   getRefreshToken,
@@ -6,7 +7,7 @@ import {
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:9000",
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -23,7 +24,7 @@ instance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 instance.interceptors.response.use(
@@ -49,7 +50,7 @@ instance.interceptors.response.use(
           });
 
           const { accessToken } = rs.data;
-          console.log("Token refreshed successfully :" , accessToken);
+          console.log("Token refreshed successfully :", accessToken);
           updateAccessToken(accessToken);
 
           return instance(originalConfig);
@@ -60,7 +61,7 @@ instance.interceptors.response.use(
     }
 
     return Promise.reject(err);
-  }
+  },
 );
 
 export default instance;
