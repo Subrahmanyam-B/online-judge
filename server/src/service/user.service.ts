@@ -31,6 +31,7 @@ export const CreateUser = async (
   const existingCustomer = await repo.findUser(email);
   if (existingCustomer) throw new NotFoundError("User already exists");
 
+  //TODO : add verification
   const newUser = await repo.createUser({
     firstName,
     lastName,
@@ -40,7 +41,7 @@ export const CreateUser = async (
     verificationCode: otp,
     verificationCodeExpiry: expiry,
     salt,
-    verified: false,
+    verified: true,
   } as User);
 
   if (newUser) {
