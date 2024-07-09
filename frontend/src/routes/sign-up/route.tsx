@@ -8,6 +8,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { AuthPayload, ValidateSignature } from "@/lib/auth";
 import { authAtom } from "@/state/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,9 +55,9 @@ const SignUpForm = () => {
 
   useEffect(() => {
     if (auth.isAuthenticated) {
-      router.history.push('/dashboard');
+      router.history.push("/dashboard");
     }
-  }, [auth, router])
+  }, [auth, router]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -78,20 +79,21 @@ const SignUpForm = () => {
         values.lastName,
         values.displayName,
         values.email,
-        values.password
-      )        .then((response) => {
-        if (response.accessToken) {
-          return ValidateSignature();
-        }
-        throw new Error("SignUp failed");
-      })
-      .then((payload: AuthPayload | false) => {
-        if (payload) {
-          setAuth({ isAuthenticated: true, user: payload })
-          router.history.push("/dashboard");
-        }
-      });
-      
+        values.password,
+      )
+        .then((response) => {
+          if (response.accessToken) {
+            return ValidateSignature();
+          }
+          throw new Error("SignUp failed");
+        })
+        .then((payload: AuthPayload | false) => {
+          if (payload) {
+            setAuth({ isAuthenticated: true, user: payload });
+            router.history.push("/dashboard");
+          }
+        });
+
       router.history.push("/dashboard");
     } catch (error) {
       console.log(error);
@@ -164,7 +166,7 @@ const SignUpForm = () => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input
+                <PasswordInput
                   type="password"
                   autoComplete="new-password"
                   placeholder="Password"
@@ -181,9 +183,8 @@ const SignUpForm = () => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input
+                <PasswordInput
                   type="password"
-                  autoComplete="new-password"
                   placeholder="Confirm Password"
                   {...field}
                 />

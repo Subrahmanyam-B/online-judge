@@ -27,6 +27,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useRecoilValue } from "recoil";
 import { authAtom } from "@/state/auth";
 import { useEffect } from "react";
+import { PasswordInput } from "@/components/ui/password-input";
 
 const formSchema = z.object({
   firstName: z.string().min(1).max(255),
@@ -95,15 +96,15 @@ function ProfileSettings() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="current-password">Current Password</Label>
-                <Input type="password" id="current-password" />
+                <PasswordInput type="password" id="current-password" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="new-password">New Password</Label>
-                <Input type="password" id="new-password" />
+                <PasswordInput type="password" id="new-password" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirm-password">Confirm Password</Label>
-                <Input type="password" id="confirm-password" />
+                <PasswordInput type="password" id="confirm-password" />
               </div>
             </CardContent>
           </Card>
@@ -122,7 +123,7 @@ export function MyForm({
 }: {
   data: ProfileData;
   refetch: (
-    options?: RefetchOptions | undefined
+    options?: RefetchOptions | undefined,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) => Promise<QueryObserverResult<any, Error>>;
 }) {

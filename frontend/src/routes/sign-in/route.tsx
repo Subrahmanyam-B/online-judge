@@ -7,6 +7,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { toast } from "@/components/ui/use-toast";
 import { AuthPayload, ValidateSignature } from "@/lib/auth";
 import { authAtom } from "@/state/auth";
@@ -56,7 +57,7 @@ const SignInForm = () => {
           router.history.push("/dashboard");
         }
       })
-      .catch((err) => {
+      .catch(() => {
         toast({
           title: "Login Failed",
           description: "Error with logging in. Please try again.",
@@ -92,7 +93,7 @@ const SignInForm = () => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input
+                <PasswordInput
                   type="password"
                   autoComplete="new-password"
                   placeholder="Password"

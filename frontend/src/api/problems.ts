@@ -18,7 +18,7 @@ export const getProblemById = async (id: string) => {
   };
 };
 
-type GetProblem = {
+export type GetProblem = {
   title: string;
   difficulty: string;
   desc: string;
