@@ -1,6 +1,3 @@
-
-import Balancer from "react-wrap-balancer";
-
 import { Section, Container } from "./craft";
 import Logo from "../assets/Logo-hero.svg";
 import { Link } from "@tanstack/react-router";
@@ -33,9 +30,8 @@ export default function Footer() {
               <Link href="/cookie-policy">Cookie Policy</Link>
             </div>
             <p className="text-muted-foreground">
-              ©{" "}
-              <a href="https://github.com/brijr/components">AlgoArena</a>
-              . All rights reserved. 2024-present.
+              © <a href="https://github.com/brijr/components">AlgoArena</a>.
+              All rights reserved. 2024-present.
             </p>
           </div>
         </Container>
