@@ -17,6 +17,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRecoilState } from "recoil";
 import { z } from "zod";
+import BackgroundImage from "../../assets/auth-background.png";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Enter a valid email" }),
@@ -130,7 +131,9 @@ const SignInForm = () => {
 const SignIn = () => {
   return (
     <div className="w-full flex h-screen">
-      <div className="w-1/2 bg-teal-500">Image</div>
+      <div className="w-1/2 bg-teal-500">
+        <img src={BackgroundImage} alt="background" className="w-full h-full" />
+      </div>
       <div className="w-1/2 my-auto">
         <div className="flex-col px-24 lg:px-40 xl:px-50 2xl:px-64">
           <div className="text-center font-bold text-3xl p-4 py-6">
